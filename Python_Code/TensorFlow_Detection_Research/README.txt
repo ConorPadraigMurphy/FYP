@@ -1,4 +1,7 @@
 Installation Guide
+Model downloaded from: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md
+Model name: efficientdet_d0
+
 
 1. Install Anaconda(python)
 2. Project installs
