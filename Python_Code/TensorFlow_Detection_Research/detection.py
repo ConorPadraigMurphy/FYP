@@ -1,7 +1,10 @@
 import cv2
 import numpy as np
 import tensorflow as tf
+import os
 
+outputDir = 'Outputs'
+os.makedirs(outputDir, exist_ok=True)
 # Loads models
 model = tf.saved_model.load(
     'Model\efficientdet_d0_coco17_tpu-32\saved_model')
@@ -10,7 +13,10 @@ model = tf.saved_model.load(
 cap = cv2.VideoCapture('Cars.mp4')
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-output = cv2.VideoWriter('C:\\Users\\conor\\OneDrive\\Desktop\\Files\\College\\GMIT\\GMIT_Yr4\\Final_Year_Project\\Final-Year-project-work\\TensorFlow_Detection_Research\\Outputs\\output.avi', fourcc,
+
+outputPath = os.path.join(outputDir, "videoOutput.avi")
+
+output = cv2.VideoWriter(outputPath, fourcc,
                          30.0, (int(cap.get(3)), int(cap.get(4))))
 
 carCount = 0
@@ -89,7 +95,8 @@ output.release()
 cv2.destroyAllWindows()
 
 # Outputs count of vehicle to a file but must allow the video to fully play
-outputfile = 'C:\\Users\\conor\\OneDrive\\Desktop\\Files\\College\\GMIT\\GMIT_Yr4\\Final_Year_Project\\Final-Year-project-work\\TensorFlow_Detection_Research\\Outputs\\VehicleCount.txt'
+textOutputDir = os.path.join(outputDir, "VehicleCount.txt")
+outputfile = textOutputDir
 with open(outputfile, 'w') as file:
     file.write(f'Number of Cars Detected: {carCount}\n')
     file.write(f'TimeStamps + IDs: \n')
