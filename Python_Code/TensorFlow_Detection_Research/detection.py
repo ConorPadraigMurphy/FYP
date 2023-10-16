@@ -80,9 +80,10 @@ while True:
     if car_detected and class_id != 3:
         car_left_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
         car_detected = False
-        for car_info in car_ids_and_timestamps:
+        for i, car_info in enumerate(car_ids_and_timestamps):
             if car_info[2] is None:
-                car_info = (car_info[0], car_info[1], car_left_time)
+                car_ids_and_timestamps[i] = (
+                    car_info[0], car_info[1], car_left_time)
 
     output.write(frame)
     cv2.imshow('Detection tool', frame)
