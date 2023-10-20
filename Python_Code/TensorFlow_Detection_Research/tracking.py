@@ -1,76 +1,43 @@
+import numpy as np
 from ultralytics import YOLO
 import cv2
 import os
-import time as t
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 
-# load yolov8 model
-model = YOLO('./yolov8n.pt')
+# Load YOLOv8 model
+model = YOLO('yolov8n.pt')
 
-carLabel = "car"
-
-# load video
-video_path = './Cars.mp4'
-cap = cv2.VideoCapture(video_path)
-
-carDetected = False
-carAppearTime = 0.0
-carDisappearTime = 0.0
-carIdsandTimestamps = []
+# Load video
+cap = cv2.VideoCapture('./Cars.mp4')
 
 ret = True
-# read frames
+
+# Initialize a list to store car IDs
+car_ids = []
+
 while ret:
     ret, frame = cap.read()
 
     if ret:
+        # Run YOLOv8 tracking on the frame, persisting tracks between frames
+        results = model.track(frame, persist=True, classes=2)
 
-        # detect objects
-        # track objects
-        results = model.track(frame, persist=True)
+        # Visualize the results on the frame
+        annotated_frame = results[0].plot()
 
-        carResults = []
+        # Display the annotated frame
+        cv2.imshow("YOLOv8 Tracking", annotated_frame)
 
-    for car in carResults:
-        bbox = car['Bounding Box']
-        label = car['class']
-        confidence = car['conf']
+        # Break the loop if 'q' is pressed
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
 
-        x, y, w, h = [int(i) for i in bbox]
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-        labelText = f'{label} ({confidence: .2f})'
-        cv2.putText(frame, labelText, (x, y - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
-        if not carDetected:
-            carAppearTime = t.time()
-            carDetected = True
-            carID = len(carIdsandTimestamps) + 1
-            carIdsandTimestamps.append((carID, carAppearTime, None))
-
-    if carDetected and not carResults:
-        carDisappearTime = t.time()
-        carDetected = False
-
-        for i, carInfo in enumerate(carIdsandTimestamps):
-            if carInfo[2] is None:
-                carIdsandTimestamps[i] = (
-                    carInfo[0], carInfo[1], carDisappearTime)
-
-    # visualize
-    cv2.imshow('frame', frame)
-    if cv2.waitKey(25) & 0xFF == ord('q'):
-        break
-
+# Release video capture and close the OpenCV window
 cap.release()
 cv2.destroyAllWindows()
 
-textOutputDirectory = os.path.join(
-    os.path.dirname(video_path), 'CarTrackingInfo.txt')
-with open(textOutputDirectory, 'w') as file:
-    file.write('Car Tracking Information:\n')
-    for carInfo in carIdsandTimestamps:
-        file.write(
-            f'Car ID {carInfo[0]} > Entered Video: {carInfo[1]}, Left Video: {carInfo[2]}\n')
+# Write all car IDs to a text file
+with open('car_ids.txt', 'w') as car_ids_file:
+    for car_id in car_ids:
+        car_ids_file.write(f"Car ID: {car_id}\n")
