@@ -24,6 +24,7 @@ ret = True
 timeStamps = {}
 trackIDs = []
 carIDs = set()
+previousPositions = {}
 
 while ret:
     ret, frame = cap.read()
@@ -54,6 +55,19 @@ while ret:
                 timeStamps[track_id]['end_time'] = cap.get(
                     cv2.CAP_PROP_POS_MSEC) / 1000.0
 
+            if track_id in previousPositions:
+                currentPosition = (results[0].boxes.xyxy[0][0].item(
+                ), results[0].boxes.xyxy[0][1].item())
+                previousPosition = previousPositions[track_id]
+                objectDirection = (
+                    currentPosition[0] - previousPosition[0], currentPosition[1], previousPosition[1])
+
+                leftRight = 'Right' if objectDirection[0] > 0 else 'Left'
+                upDown = 'Down' if objectDirection[1] > 0 else 'Up'
+
+            previousPositions[track_id] = (
+                results[0].boxes.xyxy[0][0].item(), results[0].boxes.xyxy[0][1].item())
+
         # Break the loop if 'q' is pressed
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
@@ -69,4 +83,4 @@ with open(textOutputDir, 'w') as car_ids_file:
         start_time = timeStamps[car_id]['start_time']
         end_time = timeStamps[car_id]['end_time']
         car_ids_file.write(
-            f"Car ID: {car_id}, Entered: {start_time} secs, Exited: {end_time} secs\n")
+            f"Car ID: {car_id}, Entered: {start_time} secs, Exited: {end_time} secs, Direction: {leftRight}/{upDown}\n")
