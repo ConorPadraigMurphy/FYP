@@ -21,10 +21,7 @@ while ret:
     if ret:
         # Run YOLOv8 tracking on the frame, persisting tracks between frames
         results = model.track(frame, persist=True, classes=2)
-
         boxes = results[0].boxes.xyxy.cpu()
-        trackIDs = results[0].boxes.id.int().cpu().tolist()
-        carIDs.update(trackIDs)
 
         # Visualize the results on the frame
         annotated_frame = results[0].plot()
@@ -32,9 +29,13 @@ while ret:
         # Display the annotated frame
         cv2.imshow("YOLOv8 Tracking", annotated_frame)
 
+        if results[0].boxes is not None and results[0].boxes.id is not None:
+            trackIDs = results[0].boxes.id.int().cpu().tolist()
+            carIDs.update(trackIDs)
+
         # Break the loop if 'q' is pressed
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+        break
 
 # Release video capture and close the OpenCV window
 cap.release()
