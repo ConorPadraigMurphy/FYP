@@ -13,15 +13,20 @@ cap = cv2.VideoCapture('./Cars.mp4')
 
 ret = True
 
-# Initialize a list to store car IDs
-car_ids = []
+trackIDs = []
 
 while ret:
     ret, frame = cap.read()
 
     if ret:
         # Run YOLOv8 tracking on the frame, persisting tracks between frames
-        results = model.track(frame, persist=True, classes=2)
+        results = model.track(frame, persist=True, classes=2, stream=True)
+
+        boxes = results[0].boxes.xyxy.cpu()
+        trackIDs = results[0].boxes.id.int().cpu().tolist()
+        for result in results:
+            id = result.boxes.id
+            print('ID: ', id)
 
         # Visualize the results on the frame
         annotated_frame = results[0].plot()
@@ -39,5 +44,5 @@ cv2.destroyAllWindows()
 
 # Write all car IDs to a text file
 with open('car_ids.txt', 'w') as car_ids_file:
-    for car_id in car_ids:
+    for car_id in trackIDs:
         car_ids_file.write(f"Car ID: {car_id}\n")
