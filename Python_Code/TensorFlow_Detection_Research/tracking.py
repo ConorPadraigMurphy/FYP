@@ -25,6 +25,8 @@ timeStamps = {}
 trackIDs = []
 carIDs = set()
 previousPositions = {}
+directionCategory = {}
+carDirections = {}
 
 while ret:
     ret, frame = cap.read()
@@ -62,9 +64,12 @@ while ret:
                 objectDirection = (
                     currentPosition[0] - previousPosition[0], currentPosition[1], previousPosition[1])
 
-                leftRight = 'Right' if objectDirection[0] > 0 else 'Left'
-                upDown = 'Down' if objectDirection[1] > 0 else 'Up'
+                if objectDirection[0] > 0:
+                    directionCategory = 'Right'
+                else:
+                    directionCategory = 'Left'
 
+            carDirections[track_id] = directionCategory
             previousPositions[track_id] = (
                 results[0].boxes.xyxy[0][0].item(), results[0].boxes.xyxy[0][1].item())
 
@@ -82,5 +87,6 @@ with open(textOutputDir, 'w') as car_ids_file:
     for car_id in carIDs:
         start_time = timeStamps[car_id]['start_time']
         end_time = timeStamps[car_id]['end_time']
+        direction = carDirections.get(car_id, 'NA')
         car_ids_file.write(
-            f"Car ID: {car_id}, Entered: {start_time} secs, Exited: {end_time} secs, Direction: {leftRight}/{upDown}\n")
+            f"Car ID: {car_id}, Entered: {start_time} secs, Exited: {end_time} secs, Direction: {direction}\n")
