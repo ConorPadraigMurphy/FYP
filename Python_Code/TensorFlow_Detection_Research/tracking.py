@@ -36,18 +36,19 @@ while ret:
         results = model.track(frame, persist=True, classes=2)
         boxes = results[0].boxes.xyxy.cpu()
 
-        # Visualize the results on the frame
+        # Plots the boxes on the video
         annotated_frame = results[0].plot()
 
         output.write(annotated_frame)
 
-        # Display the annotated frame
+        # Displays the annotated_frame
         cv2.imshow("YOLOv8 Tracking", annotated_frame)
 
         if results[0].boxes is not None and results[0].boxes.id is not None:
             trackIDs = results[0].boxes.id.int().cpu().tolist()
             carIDs.update(trackIDs)
 
+            # Gets the timestamps of the teacked object IDs
             for track_id in trackIDs:
                 if track_id not in timeStamps:
                     timeStamps[track_id] = {"start_frame": cap.get(
@@ -57,6 +58,7 @@ while ret:
                 timeStamps[track_id]['end_time'] = cap.get(
                     cv2.CAP_PROP_POS_MSEC) / 1000.0
 
+            # Checks if the car is going left or right across the frame
             if track_id in previousPositions:
                 currentPosition = (results[0].boxes.xyxy[0][0].item(
                 ), results[0].boxes.xyxy[0][1].item())
@@ -73,7 +75,7 @@ while ret:
             previousPositions[track_id] = (
                 results[0].boxes.xyxy[0][0].item(), results[0].boxes.xyxy[0][1].item())
 
-        # Break the loop if 'q' is pressed
+        # End process in progress by pressing Q
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
@@ -81,7 +83,7 @@ while ret:
 cap.release()
 cv2.destroyAllWindows()
 
-# Write all car IDs to a text file
+# Write all car IDs and Timestamps of when the car appears and when the car exits the video to a text file
 textOutputDir = os.path.join(outputDir, "CarIDs&TimestampsTRACKING.txt")
 with open(textOutputDir, 'w') as car_ids_file:
     for car_id in carIDs:
