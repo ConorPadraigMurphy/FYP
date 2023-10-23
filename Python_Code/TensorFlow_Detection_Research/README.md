@@ -1,3 +1,7 @@
+## Project Kanban + Gantt Chart
+    - Kanban: https://rohansikder4.atlassian.net/jira/software/projects/KAN/boards/1
+    - Gantt Chart: https://rohansikder4.atlassian.net/jira/software/projects/KAN/boards/1/timeline
+
 ## Project Dependencies
 
 1. Install Anaconda(python) or Python
