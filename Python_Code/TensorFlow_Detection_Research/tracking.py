@@ -5,12 +5,14 @@ import os
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 outputDir = 'Outputs'
+inputDir = 'Inputs'
+vidInputDir = os.path.join(inputDir, "./Cars.mp4")
 os.makedirs(outputDir, exist_ok=True)
 # Load YOLOv8 model
 model = YOLO('yolov8n.pt')
 
 # Load video
-cap = cv2.VideoCapture('./Cars.mp4')
+cap = cv2.VideoCapture(vidInputDir)
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 outputPath = os.path.join(outputDir, "TrackingvideoOutput.avi")

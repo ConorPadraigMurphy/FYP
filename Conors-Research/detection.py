@@ -3,19 +3,19 @@ import numpy as np
 import tensorflow as tf
 import os
 
-outputDir = 'Outputs'
+outputDir = 'Detection_Outputs'
+inputDir = 'Detection_Inputs'
+vidInputDir = os.path.join(inputDir, "./Cars.mp4")
 os.makedirs(outputDir, exist_ok=True)
-# Loads models
+# Loads model
 model = tf.saved_model.load(
     'Model\efficientdet_d0_coco17_tpu-32\saved_model')
 
 # Image and Video
-cap = cv2.VideoCapture('Cars.mp4')
+cap = cv2.VideoCapture(vidInputDir)
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-
 outputPath = os.path.join(outputDir, "videoOutput.avi")
-
 output = cv2.VideoWriter(outputPath, fourcc,
                          30.0, (int(cap.get(3)), int(cap.get(4))))
 
