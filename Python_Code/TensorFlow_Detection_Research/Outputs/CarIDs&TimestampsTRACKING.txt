@@ -1,4 +1,4 @@
 Car ID: 1, Entered: 0.0 secs, Exited: 1.2012 secs, Direction: Right
-Car ID: 2, Entered: 0.33366666666666667 secs, Exited: 4.337666666666667 secs, Direction: Right
-Car ID: 3, Entered: 2.7694333333333336 secs, Exited: 4.838166666666667 secs, Direction: Right
-Car ID: 4, Entered: 3.7704333333333335 secs, Exited: 4.838166666666667 secs, Direction: Left
+Car ID: 2, Entered: 0.33366666666666667 secs, Exited: 4.137466666666667 secs, Direction: Right
+Car ID: 3, Entered: 2.7694333333333336 secs, Exited: 4.137466666666667 secs, Direction: Right
+Car ID: 4, Entered: 3.7704333333333335 secs, Exited: 4.137466666666667 secs, Direction: Right
