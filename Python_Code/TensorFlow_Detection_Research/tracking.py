@@ -16,19 +16,17 @@ cap = cv2.VideoCapture(vidInputDir)
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 outputPath = os.path.join(outputDir, "TrackingvideoOutput.avi")
-output = cv2.VideoWriter(outputPath, fourcc,
-                         30.0, (int(cap.get(3)), int(cap.get(4))))
-
-frameRate = int(cap.get(cv2.CAP_PROP_FPS))
-
-ret = True
+output = cv2.VideoWriter(outputPath, fourcc, 30.0,
+                         (int(cap.get(3)), int(cap.get(4))))
 
 timeStamps = {}
 trackIDs = []
 carIDs = set()
-previousPositions = {}
 directionCategory = {}
 carDirections = {}
+previousPosition = {}
+
+ret = True
 
 while ret:
     ret, frame = cap.read()
@@ -61,23 +59,20 @@ while ret:
                     cv2.CAP_PROP_POS_MSEC) / 1000.0
 
             # Checks if the car is going left or right across the frame
-            if track_id in previousPositions:
-                currentPosition = (results[0].boxes.xyxy[0][0].item(
-                ), results[0].boxes.xyxy[0][1].item())
-                previousPosition = previousPositions[track_id]
-                objectDirection = (
-                    currentPosition[0] - previousPosition[0], currentPosition[1], previousPosition[1])
+            currentX = results[0].boxes.xyxy[0][0].item()
+            if track_id in previousPosition:
+                previousX = previousPosition[track_id]
+                objectDirection = currentX - previousX
 
-                if objectDirection[0] > 0:
+                if objectDirection > 0:
                     directionCategory = 'Right'
                 else:
                     directionCategory = 'Left'
 
             carDirections[track_id] = directionCategory
-            previousPositions[track_id] = (
-                results[0].boxes.xyxy[0][0].item(), results[0].boxes.xyxy[0][1].item())
+            previousPosition[track_id] = currentX
 
-        # End process in progress by pressing Q
+    # End process in progress by pressing Q
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
