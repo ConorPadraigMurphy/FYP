@@ -1,14 +1,16 @@
-import numpy as np
 from ultralytics import YOLO
 import cv2
 import os
 import time
+import datetime
+
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 outputDir = 'Outputs'
 inputDir = 'Inputs'
 vidInputDir = os.path.join(inputDir, "./Cars.mp4")
 os.makedirs(outputDir, exist_ok=True)
+
 # Load YOLOv8 model
 model = YOLO('yolov8n.pt')
 
@@ -28,6 +30,22 @@ carDirections = {}
 previousPosition = {}
 frameCount = 0
 startTime = time.time()
+
+
+def getVideoDateTime(videoPath):
+    try:
+        filmTime = cap.get(cv2.CAP_PROP_POS_MSEC)
+        if filmTime > 0:
+            filmDateTime = datetime.datetime.fromtimestamp(
+                filmTime / 1000)
+            return filmDateTime.date(), filmDateTime.time()
+        else:
+            return None, None
+    except:
+        return None, None
+
+
+vidFilmDate, vidFilmTime = getVideoDateTime(vidInputDir)
 
 
 ret = True
@@ -74,6 +92,7 @@ while ret:
             carDirections[track_id] = directionCategory
             previousPosition[track_id] = currentX
 
+    # Works out how many frames are executed by the process per second
     endTime = time.time()
     totalTime = endTime - startTime
     FPS = frameCount/totalTime
@@ -102,6 +121,8 @@ cv2.destroyAllWindows()
 # Write all car IDs and Timestamps of when the car appears and when the car exits the video to a text file
 textOutputDir = os.path.join(outputDir, "CarIDs&TimestampsTRACKING.txt")
 with open(textOutputDir, 'w') as car_ids_file:
+    car_ids_file.write(
+        f'Date Filmed: {vidFilmDate}  Time Filmed: {vidFilmTime}\n')
     for car_id in carIDs:
         start_time = timeStamps[car_id]['start_time']
         end_time = timeStamps[car_id]['end_time']
