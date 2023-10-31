@@ -2,6 +2,7 @@ import numpy as np
 from ultralytics import YOLO
 import cv2
 import os
+import time
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 outputDir = 'Outputs'
@@ -25,6 +26,9 @@ carIDs = set()
 directionCategory = {}
 carDirections = {}
 previousPosition = {}
+frameCount = 0
+startTime = time.time()
+
 
 ret = True
 
@@ -32,6 +36,7 @@ while ret:
     ret, frame = cap.read()
 
     if ret:
+        frameCount += 1
         # Run YOLOv8 tracking on the frame, persisting tracks between frames, classes=2(car)
         results = model.track(frame, persist=True, classes=2)
         boxes = results[0].boxes.xyxy.cpu()
@@ -40,9 +45,6 @@ while ret:
         annotated_frame = results[0].plot()
 
         output.write(annotated_frame)
-
-        # Displays the annotated_frame
-        cv2.imshow("YOLOv8 Tracking", annotated_frame)
 
         if results[0].boxes is not None and results[0].boxes.id is not None:
             trackIDs = results[0].boxes.id.int().cpu().tolist()
@@ -71,6 +73,23 @@ while ret:
 
             carDirections[track_id] = directionCategory
             previousPosition[track_id] = currentX
+
+    endTime = time.time()
+    totalTime = endTime - startTime
+    FPS = frameCount/totalTime
+
+    annotated_frameFPS = annotated_frame.copy()
+    text = f'FPS: {FPS: .2f}'
+    cv2.putText(annotated_frameFPS, text, (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+    output.write(annotated_frameFPS)
+    print(f'FPS: {FPS: .2f}')
+
+    # Displays the annotated_frameFPS which adds the FPS which the tracking process is taking
+    cv2.imshow("YOLOv8 Tracking", annotated_frameFPS)
+
+    frameCount = 0
+    startTime = endTime
 
     # End process in progress by pressing Q
     if cv2.waitKey(1) & 0xFF == ord("q"):
