@@ -12,6 +12,7 @@ This is the README for Rohan and Conors Final Year Project
     - pip install ultralytics
     - pip install numpy
     - pip install opencv-python
+    - pip install flask
     - Model: YoloV8 (Ultralytics)
 
 3. Installs for Detection.py -> No longer in use but still available to run in Conors-Research Folder
@@ -23,4 +24,12 @@ This is the README for Rohan and Conors Final Year Project
     - pip install tf-models-official
     - model used: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md
     - model name: efficientdet_d0
+
+## How to to run Flask Application
+1. Install Flask
+    - pip install flask
+2. Use Command where Tracking.py is located
+    - flask run
+
+After Tracking has ended, Open http://127.0.0.1:5000/api/car_info in browser.
 

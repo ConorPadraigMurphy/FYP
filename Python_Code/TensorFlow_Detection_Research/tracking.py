@@ -3,6 +3,10 @@ from ultralytics import YOLO
 import cv2
 import os
 
+from flask import Flask, jsonify
+app = Flask(__name__)
+
+
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 outputDir = 'Outputs'
 inputDir = 'Inputs'
@@ -94,3 +98,24 @@ with open(textOutputDir, 'w') as car_ids_file:
         direction = carDirections.get(car_id, 'NA')
         car_ids_file.write(
             f"Car ID: {car_id}, Entered: {start_time} secs, Exited: {end_time} secs, Direction: {direction}\n")
+        
+
+
+# Endpoint to get car IDs, timestamps, and directions as JSON - http://127.0.0.1:5000/api/car_info
+@app.route('/api/car_info', methods=['GET'])
+def get_car_info():
+    car_info = []
+    for car_id in carIDs:
+        start_time = timeStamps[car_id]['start_time']
+        end_time = timeStamps[car_id]['end_time']
+        direction = carDirections.get(car_id, 'NA')
+        car_info.append({
+            "car_id": car_id,
+            "entered_time": start_time,
+            "exited_time": end_time,
+            "direction": direction
+        })
+    return jsonify(car_info)
+
+if __name__ == '__main__':
+    app.run(debug=True)
