@@ -1,7 +1,9 @@
-import numpy as np
 from ultralytics import YOLO
 import cv2
 import os
+import time
+import datetime
+
 
 from flask import Flask, jsonify
 app = Flask(__name__)
@@ -12,6 +14,7 @@ outputDir = 'Outputs'
 inputDir = 'Inputs'
 vidInputDir = os.path.join(inputDir, "./Cars.mp4")
 os.makedirs(outputDir, exist_ok=True)
+
 # Load YOLOv8 model
 model = YOLO('yolov8n.pt')
 
@@ -20,24 +23,42 @@ cap = cv2.VideoCapture(vidInputDir)
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 outputPath = os.path.join(outputDir, "TrackingvideoOutput.avi")
-output = cv2.VideoWriter(outputPath, fourcc,
-                         30.0, (int(cap.get(3)), int(cap.get(4))))
-
-frameRate = int(cap.get(cv2.CAP_PROP_FPS))
-
-ret = True
+output = cv2.VideoWriter(outputPath, fourcc, 30.0,
+                         (int(cap.get(3)), int(cap.get(4))))
 
 timeStamps = {}
 trackIDs = []
 carIDs = set()
-previousPositions = {}
 directionCategory = {}
 carDirections = {}
+previousPosition = {}
+frameCount = 0
+startTime = time.time()
+
+
+def getVideoDateTime(videoPath):
+    try:
+        filmTime = cap.get(cv2.CAP_PROP_POS_MSEC)
+        if filmTime > 0:
+            filmDateTime = datetime.datetime.fromtimestamp(
+                filmTime / 1000)
+            return filmDateTime.date(), filmDateTime.time()
+        else:
+            return None, None
+    except:
+        return None, None
+
+
+vidFilmDate, vidFilmTime = getVideoDateTime(vidInputDir)
+
+
+ret = True
 
 while ret:
     ret, frame = cap.read()
 
     if ret:
+        frameCount += 1
         # Run YOLOv8 tracking on the frame, persisting tracks between frames, classes=2(car)
         results = model.track(frame, persist=True, classes=2)
         boxes = results[0].boxes.xyxy.cpu()
@@ -46,9 +67,6 @@ while ret:
         annotated_frame = results[0].plot()
 
         output.write(annotated_frame)
-
-        # Displays the annotated_frame
-        cv2.imshow("YOLOv8 Tracking", annotated_frame)
 
         if results[0].boxes is not None and results[0].boxes.id is not None:
             trackIDs = results[0].boxes.id.int().cpu().tolist()
@@ -65,23 +83,38 @@ while ret:
                     cv2.CAP_PROP_POS_MSEC) / 1000.0
 
             # Checks if the car is going left or right across the frame
-            if track_id in previousPositions:
-                currentPosition = (results[0].boxes.xyxy[0][0].item(
-                ), results[0].boxes.xyxy[0][1].item())
-                previousPosition = previousPositions[track_id]
-                objectDirection = (
-                    currentPosition[0] - previousPosition[0], currentPosition[1], previousPosition[1])
+            currentX = results[0].boxes.xyxy[0][0].item()
+            if track_id in previousPosition:
+                previousX = previousPosition[track_id]
+                objectDirection = currentX - previousX
 
-                if objectDirection[0] > 0:
+                if objectDirection > 0:
                     directionCategory = 'Right'
                 else:
                     directionCategory = 'Left'
 
             carDirections[track_id] = directionCategory
-            previousPositions[track_id] = (
-                results[0].boxes.xyxy[0][0].item(), results[0].boxes.xyxy[0][1].item())
+            previousPosition[track_id] = currentX
 
-        # End process in progress by pressing Q
+    # Works out how many frames are executed by the process per second
+    endTime = time.time()
+    totalTime = endTime - startTime
+    FPS = frameCount/totalTime
+
+    annotated_frameFPS = annotated_frame.copy()
+    text = f'FPS: {FPS: .2f}'
+    cv2.putText(annotated_frameFPS, text, (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+    output.write(annotated_frameFPS)
+    print(f'FPS: {FPS: .2f}')
+
+    # Displays the annotated_frameFPS which adds the FPS which the tracking process is taking
+    cv2.imshow("YOLOv8 Tracking", annotated_frameFPS)
+
+    frameCount = 0
+    startTime = endTime
+
+    # End process in progress by pressing Q
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
@@ -92,6 +125,8 @@ cv2.destroyAllWindows()
 # Write all car IDs and Timestamps of when the car appears and when the car exits the video to a text file
 textOutputDir = os.path.join(outputDir, "CarIDs&TimestampsTRACKING.txt")
 with open(textOutputDir, 'w') as car_ids_file:
+    car_ids_file.write(
+        f'Date Filmed: {vidFilmDate}  Time Filmed: {vidFilmTime}\n')
     for car_id in carIDs:
         start_time = timeStamps[car_id]['start_time']
         end_time = timeStamps[car_id]['end_time']
