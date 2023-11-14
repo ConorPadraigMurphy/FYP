@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import cv2
 import os
 import time
-import datetime
+from datetime import datetime
 
 
 from flask import Flask, jsonify
@@ -19,7 +19,10 @@ os.makedirs(outputDir, exist_ok=True)
 model = YOLO('yolov8n.pt')
 
 # Load video
+statInfo = os.stat(vidInputDir)
 cap = cv2.VideoCapture(vidInputDir)
+creationTime = datetime.fromtimestamp(statInfo.st_ctime)
+justTime = creationTime.strftime('%H:%M:%S')
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 outputPath = os.path.join(outputDir, "TrackingvideoOutput.avi")
@@ -147,8 +150,7 @@ cv2.destroyAllWindows()
 # Write all car IDs and Timestamps of when the car appears and when the car exits the video to a text file
 textOutputDir = os.path.join(outputDir, "CarIDs&TimestampsTRACKING.txt")
 with open(textOutputDir, 'w') as car_ids_file:
-    car_ids_file.write(
-        f'Date Filmed: {vidFilmDate}  Time Filmed: {vidFilmTime}\n')
+    car_ids_file.write(f'Filmed: {creationTime}, Time: {justTime}\n')
     for car_id in carIDs:
         start_time = timeStamps[car_id]['start_time']
         end_time = timeStamps[car_id]['end_time']
