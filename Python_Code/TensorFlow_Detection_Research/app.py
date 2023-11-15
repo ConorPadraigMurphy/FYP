@@ -67,8 +67,8 @@ while ret:
             
             # Gets the timestamps of the teacked object IDs
             for track_id in trackIDs:
-                print(str(i) + "   " + results[0].boxes.id[i])
-                print(str(i) + "   " + results[0].boxes.cls[i])
+                print(str(i) + "   " + str(results[0].boxes.id[i].item()))
+                print(str(i) + "   " + str(results[0].boxes.id[i].item()))
                 if track_id not in timeStamps:
                     timeStamps[track_id] = {"start_frame": cap.get(
                         cv2.CAP_PROP_POS_FRAMES), "start_time": cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0}
