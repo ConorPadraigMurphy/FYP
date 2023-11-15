@@ -54,8 +54,9 @@ while ret:
 
     if ret:
         frameCount += 1
-        # Run YOLOv8 tracking on the frame, persisting tracks between frames, bus = 5, car = 2
+        # Downscales video that is being processed to 640x420
         frame = cv2.resize(frame, (downscaleWidth, downscaleHeight), interpolation=cv2.INTER_LINEAR)
+        # Run YOLOv8 tracking on the frame, persisting tracks between frames, bus = 5, car = 2
         results = model.track(frame, persist=True, classes=[2,5])
         boxes = results[0].boxes.xyxy.cpu()
 
