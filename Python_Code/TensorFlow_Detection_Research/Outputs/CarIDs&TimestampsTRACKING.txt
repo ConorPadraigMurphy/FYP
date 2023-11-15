@@ -1,9 +1,5 @@
-Filmed: 2023-10-27 21:32:04.818872, Time: 21:32:04
-Car ID: 1, Entered: 0.0 secs, Exited: 1.2012 secs, Direction: Right
-Car ID: 2, Entered: 0.33366666666666667 secs, Exited: 4.337666666666667 secs, Direction: Right
-Car ID: 3, Entered: 2.7694333333333336 secs, Exited: 6.7067000000000005 secs, Direction: Right
-Car ID: 4, Entered: 3.7704333333333335 secs, Exited: 7.040366666666667 secs, Direction: Right
-Car ID: 5, Entered: 5.872533333333334 secs, Exited: 9.342666666666666 secs, Direction: Right
-Car ID: 6, Entered: 7.874533333333334 secs, Exited: 11.311300000000001 secs, Direction: Right
-Car ID: 8, Entered: 9.142466666666667 secs, Exited: 11.077733333333335 secs, Direction: Left
-Car ID: 9, Entered: 10.5105 secs, Exited: 13.6136 secs, Direction: Right
+Filmed: 2023-11-13 13:12:13.275520, Time: 13:12:13
+Car ID: 1, Entered: 0.0 secs, Exited: 1.2337666666666667 secs, Direction: Right
+Car ID: 2, Entered: 0.0 secs, Exited: 1.2337666666666667 secs, Direction: Right
+Car ID: 3, Entered: 0.0666888888888889 secs, Exited: 0.23340000000000002 secs, Direction: Left
+Car ID: 5, Entered: 1.0670333333333333 secs, Exited: 1.2337666666666667 secs, Direction: Left
