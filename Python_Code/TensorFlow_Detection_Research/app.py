@@ -12,7 +12,7 @@ app = Flask(__name__)
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 outputDir = 'Outputs'
 inputDir = 'Inputs'
-vidInputDir = os.path.join(inputDir, "./Cars.mp4")
+vidInputDir = os.path.join(inputDir, "./AtuBuses.mp4")
 os.makedirs(outputDir, exist_ok=True)
 
 # Load YOLOv8 model
@@ -21,7 +21,9 @@ model = YOLO('yolov8n.pt')
 # Load video
 statInfo = os.stat(vidInputDir)
 cap = cv2.VideoCapture(vidInputDir)
-creationTime = datetime.fromtimestamp(statInfo.st_ctime)
+
+# Getting time and date of video creation
+creationTime = datetime.fromtimestamp(statInfo.st_mtime)
 justTime = creationTime.strftime('%H:%M:%S')
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -39,22 +41,6 @@ frameCount = 0
 startTime = time.time()
 
 
-def getVideoDateTime(videoPath):
-    try:
-        filmTime = cap.get(cv2.CAP_PROP_POS_MSEC)
-        if filmTime > 0:
-            filmDateTime = datetime.datetime.fromtimestamp(
-                filmTime / 1000)
-            return filmDateTime.date(), filmDateTime.time()
-        else:
-            return None, None
-    except:
-        return None, None
-
-
-vidFilmDate, vidFilmTime = getVideoDateTime(vidInputDir)
-
-
 ret = True
 
 while ret:
@@ -62,22 +48,27 @@ while ret:
 
     if ret:
         frameCount += 1
-        # Run YOLOv8 tracking on the frame, persisting tracks between frames, classes=2(car)
-        results = model.track(frame, persist=True, classes=2)
+        # Run YOLOv8 tracking on the frame, persisting tracks between frames, bus = 5, car = 2
+        results = model.track(frame, persist=True, classes=[2,5])
         boxes = results[0].boxes.xyxy.cpu()
+        
 
         # Plots the boxes on the video
         annotated_frame = results[0].plot()
-
         output.write(annotated_frame)
 
         if results[0].boxes is not None and results[0].boxes.id is not None:
             trackIDs = results[0].boxes.id.int().cpu().tolist()
+            print(results[0].boxes.cls)
+            print(results[0].boxes.id)
             carIDs.update(trackIDs)
 
+            i = 0
+            
             # Gets the timestamps of the teacked object IDs
             for track_id in trackIDs:
-
+                print(str(i) + "   " + results[0].boxes.id[i])
+                print(str(i) + "   " + results[0].boxes.cls[i])
                 if track_id not in timeStamps:
                     timeStamps[track_id] = {"start_frame": cap.get(
                         cv2.CAP_PROP_POS_FRAMES), "start_time": cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0}
@@ -100,6 +91,8 @@ while ret:
 
                     carDirections[track_id] = objectDirection  # Append the direction to the list
                     previousPosition[track_id] = currentX
+                
+                i+=1
 
             # Update end timestamps as the car is still being tracked
             timeStamps[track_id]['end_frame'] = cap.get(cv2.CAP_PROP_POS_FRAMES)
