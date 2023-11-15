@@ -5,7 +5,8 @@ import time
 from datetime import datetime
 
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, abort
+from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 
@@ -176,7 +177,39 @@ def get_car_info():
             "exited_time": end_time,
             "direction": direction
         })
-    return jsonify(car_info)
+    return jsonify(({
+        "video_info": {
+            "creationTime": creationTime.strftime("%Y-%m-%d %H:%M:%S"),
+            "justTime": justTime
+        },
+        "car_info": car_info
+    }))
+
+
+
+# Get the current directory
+current_dir = os.path.dirname(os.path.realpath(__file__))
+inputs_dir = os.path.join(current_dir, 'inputs')
+
+# Define a route to handle uploading a video file
+@app.route('/upload', methods=['POST'])
+def upload_video():
+
+  # Check if the request contains a file part
+  if 'file' not in request.files:
+    return abort(400, 'No file part found in request.')
+
+  # Get the file from the request
+  file = request.files['file']
+
+  filename = secure_filename(file.filename)
+
+  # Save the file to the current directory
+  file.save(os.path.join(inputs_dir, filename))
+
+  # Return a JSON response with the message "Video uploaded successfully."
+  return jsonify({'message': 'Video uploaded successfully.'})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
