@@ -3,6 +3,7 @@ import cv2
 import os
 import time
 from datetime import datetime
+import numpy as np
 
 
 from flask import Flask, jsonify
@@ -22,14 +23,19 @@ model = YOLO('yolov8n.pt')
 statInfo = os.stat(vidInputDir)
 cap = cv2.VideoCapture(vidInputDir)
 
+downscaleWidth = 640
+downscaleHeight = 420
+
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, downscaleWidth)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, downscaleHeight)
+
 # Getting time and date of video creation
 creationTime = datetime.fromtimestamp(statInfo.st_mtime)
 justTime = creationTime.strftime('%H:%M:%S')
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 outputPath = os.path.join(outputDir, "TrackingvideoOutput.avi")
-output = cv2.VideoWriter(outputPath, fourcc, 30.0,
-                         (int(cap.get(3)), int(cap.get(4))))
+output = cv2.VideoWriter(outputPath, fourcc, 30.0,(downscaleWidth, downscaleHeight))
 
 timeStamps = {}
 trackIDs = []
@@ -49,9 +55,10 @@ while ret:
     if ret:
         frameCount += 1
         # Run YOLOv8 tracking on the frame, persisting tracks between frames, bus = 5, car = 2
+        frame = cv2.resize(frame, (downscaleWidth, downscaleHeight), interpolation=cv2.INTER_LINEAR)
         results = model.track(frame, persist=True, classes=[2,5])
         boxes = results[0].boxes.xyxy.cpu()
-        
+
 
         # Plots the boxes on the video
         annotated_frame = results[0].plot()
@@ -59,8 +66,8 @@ while ret:
 
         if results[0].boxes is not None and results[0].boxes.id is not None:
             trackIDs = results[0].boxes.id.int().cpu().tolist()
-            print(results[0].boxes.cls)
-            print(results[0].boxes.id)
+            print(f"Class ID:   {results[0].boxes.cls}")
+            print(f"Object ID:  {results[0].boxes.id}")
             carIDs.update(trackIDs)
 
             i = 0
@@ -68,7 +75,7 @@ while ret:
             # Gets the timestamps of the teacked object IDs
             for track_id in trackIDs:
                 print(str(i) + "   " + str(results[0].boxes.id[i].item()))
-                print(str(i) + "   " + str(results[0].boxes.id[i].item()))
+                print(str(i) + "   " + str(results[0].boxes.cls[i].item()))
                 if track_id not in timeStamps:
                     timeStamps[track_id] = {"start_frame": cap.get(
                         cv2.CAP_PROP_POS_FRAMES), "start_time": cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0}
@@ -121,8 +128,7 @@ while ret:
 
     annotated_frameFPS = annotated_frame.copy()
     text = f'FPS: {FPS: .2f}'
-    cv2.putText(annotated_frameFPS, text, (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+    cv2.putText(annotated_frameFPS, text, (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
     output.write(annotated_frameFPS)
     print(f'FPS: {FPS: .2f}')
 
