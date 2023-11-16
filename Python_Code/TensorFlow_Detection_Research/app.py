@@ -7,11 +7,10 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 outputDir = 'Outputs'
 inputDir = 'Inputs'
-vidInputDir = os.path.join(inputDir, "./AtuBuses.mp4")
+vidInputDir = os.path.join(inputDir, "./bus.mp4")
 os.makedirs(outputDir, exist_ok=True)
 
 # Load YOLOv8 model
@@ -37,6 +36,7 @@ fourcc = cv2.VideoWriter_fourcc(*'XVID')
 outputPath = os.path.join(outputDir, "TrackingvideoOutput.avi")
 output = cv2.VideoWriter(outputPath, fourcc, 30.0,(downscaleWidth, downscaleHeight))
 
+# Defining variables
 timeStamps, trackIDs, objectIDs = {}, [], set()
 objectDirections, previousPosition = {}, {}
 objectClassPairs, uniqueObjectIDs = [], set()
@@ -176,7 +176,7 @@ with open(textOutputDir, 'w') as object_ids_file:
         else:
             direction = 'Left'
         object_ids_file.write(
-            f"Object ID: {objectID}, Class ID: {class_id}, Entered: {start_time} secs, Exited: {end_time} secs, Direction: {direction}\n")
+            f"Object ID: {objectID}, Class ID: {class_id}, Entered: {start_time :.2f} secs, Exited: {end_time :.2f} secs, Direction: {direction}\n")
         
 
 
@@ -185,6 +185,14 @@ with open(textOutputDir, 'w') as object_ids_file:
 def get_object_info():
     object_info = []
     for object_id in objectIDs:
+        for objectInfo in objectClassPairs:
+            if objectInfo['ObjectId: '] == object_id:
+                class_id = objectInfo['ClassId: ']
+                if class_id == 2:
+                    class_id = 'Car'
+                elif class_id == 5:
+                    class_id = 'Bus'
+                break
         start_time = timeStamps[object_id]['start_time']
         end_time = timeStamps[object_id]['end_time']
         direction = objectDirections.get(object_id, 'NA')
@@ -194,6 +202,7 @@ def get_object_info():
             direction = 'Left'
         object_info.append({
             "object_id": object_id,
+            'class_id': class_id,
             "entered_time": start_time,
             "exited_time": end_time,
             "direction": direction
