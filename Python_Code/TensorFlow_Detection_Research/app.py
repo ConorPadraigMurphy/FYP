@@ -102,7 +102,7 @@ while ret:
                     previousPosition[track_id] = currentX
                 
 
-            # Update end timestamps as the car is still being tracked
+            # Update end timestamps as the object is still being tracked
             timeStamps[track_id]['end_frame'] = cap.get(cv2.CAP_PROP_POS_FRAMES)
             timeStamps[track_id]['end_time'] = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0
 
@@ -158,7 +158,7 @@ newJustTime = "{:02}:{:02}:{:02}".format(int(hours), int(minutes), int(seconds))
 cap.release()
 cv2.destroyAllWindows()
 
-# Write all car IDs and Timestamps of when the car appears and when the car exits the video to a text file
+# Write all object IDs and Timestamps of when the object appears and when the object exits the video to a text file
 textOutputDir = os.path.join(outputDir, "ObjectIDs&TimestampsTRACKING.txt")
 with open(textOutputDir, 'w') as object_ids_file:
     object_ids_file.write(f'Filmed: {creationTime}, Time: {newJustTime}\n')
@@ -187,7 +187,7 @@ with open(textOutputDir, 'w') as object_ids_file:
         
 
 
-# Endpoint to get car IDs, timestamps, and directions as JSON - http://127.0.0.1:5000/api/object_info
+# Endpoint to get object IDs, timestamps, and directions as JSON - http://127.0.0.1:5000/api/object_info
 @app.route('/api/object_info', methods=['GET'])
 def get_object_info():
     object_info = []
