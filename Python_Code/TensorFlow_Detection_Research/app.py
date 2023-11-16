@@ -67,10 +67,12 @@ while ret:
             for i, track_id in enumerate(trackIDs):
                 class_id = results[0].boxes.cls[i].int().item()
                 
+                # Adds objects ids and class ID to uniqueObjectIDs as long as it is not already in it
                 if track_id not in uniqueObjectIDs:
                     objectClassPairs.append({'ObjectId: ':track_id, 'ClassId: ':class_id})
                     uniqueObjectIDs.add(track_id)
 
+                # Gets the time that the object enters the videos frame and the time that it leaves the frame
                 if track_id not in timeStamps:
                     timeStamps[track_id] = {"start_frame": cap.get(
                         cv2.CAP_PROP_POS_FRAMES), "start_time": cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0}
@@ -79,12 +81,13 @@ while ret:
                 timeStamps[track_id]['end_time'] = cap.get(
                     cv2.CAP_PROP_POS_MSEC) / 1000.0
 
-
+                # Adds object ID to previous positions to keep track of object
                 if track_id not in previousPosition:
                     previousPosition[track_id] = results[0].boxes.xyxy[trackIDs.index(track_id)][0].item()
 
                 currentX = results[0].boxes.xyxy[trackIDs.index(track_id)][0].item()
 
+                # Tracks direction of object
                 if currentX is not None and previousPosition[track_id] is not None:
                     objectDirection = float(currentX) - float(previousPosition[track_id])
 
