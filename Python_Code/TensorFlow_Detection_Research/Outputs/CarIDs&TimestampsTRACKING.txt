@@ -1,5 +1,0 @@
-Filmed: 2023-11-13 13:12:13.275520, Time: 13:12:13
-Car ID: 1, Entered: 0.0 secs, Exited: 1.2337666666666667 secs, Direction: Right
-Car ID: 2, Entered: 0.0 secs, Exited: 1.2337666666666667 secs, Direction: Right
-Car ID: 3, Entered: 0.0666888888888889 secs, Exited: 0.23340000000000002 secs, Direction: Left
-Car ID: 5, Entered: 1.0670333333333333 secs, Exited: 1.2337666666666667 secs, Direction: Left
