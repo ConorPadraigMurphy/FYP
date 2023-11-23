@@ -31,5 +31,5 @@ This is the README for Rohan and Conors Final Year Project
 2. Use Command where Tracking.py is located
     - flask run
 
-After Tracking has ended, Open http://127.0.0.1:5000/api/car_info in browser.
+After Tracking has ended, Open http://127.0.0.1:5000/api/car_info OR http://127.0.0.1:5000/api/bus_info in browser to see the JSON output.
 
