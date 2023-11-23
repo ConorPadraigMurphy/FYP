@@ -9,12 +9,10 @@ from flask import Flask, jsonify, request, abort
 from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
-app = Flask(__name__)
-
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 outputDir = 'Outputs'
 inputDir = 'Inputs'
-vidInputDir = os.path.join(inputDir, "./bus.mp4")
+vidInputDir = os.path.join(inputDir, "./ATUBuses.mp4")
 os.makedirs(outputDir, exist_ok=True)
 
 # Load YOLOv8 model
@@ -44,6 +42,8 @@ output = cv2.VideoWriter(outputPath, fourcc, 30.0,(downscaleWidth, downscaleHeig
 timeStamps, trackIDs, objectIDs = {}, [], set()
 objectDirections, previousPosition = {}, {}
 objectClassPairs, uniqueObjectIDs = [], set()
+busInfo, carInfo = [], []
+busIDsFile, carIDsFile = [], [] 
 startTime = time.time()
 frameCount = 0
 
@@ -58,7 +58,7 @@ while ret:
         # Downscales video that is being processed to 640x420
         frame = cv2.resize(frame, (downscaleWidth, downscaleHeight), interpolation=cv2.INTER_LINEAR)
         # Run YOLOv8 tracking on the frame, persisting tracks between frames, bus = 5, car = 2
-        results = model.track(frame, persist=True, classes=[2,5])
+        results = model.track(frame, persist=True, classes=[2, 5])
         boxes = results[0].boxes.xyxy.cpu()
         # Plots the boxes on the video
         annotated_frame = results[0].plot()
@@ -159,67 +159,93 @@ cap.release()
 cv2.destroyAllWindows()
 
 # Write all object IDs and Timestamps of when the object appears and when the object exits the video to a text file
-textOutputDir = os.path.join(outputDir, "ObjectIDs&TimestampsTRACKING.txt")
-with open(textOutputDir, 'w') as object_ids_file:
-    object_ids_file.write(f'Filmed: {creationTime}, Time: {newJustTime}\n')
-    for objectID in objectIDs:
-        start_time = timeStamps[objectID]['start_time']
-        end_time = timeStamps[objectID]['end_time']
-        class_id = None
-        
-        for objectInfo in objectClassPairs:
-            if objectInfo['ObjectId: '] == objectID:
-                class_id = objectInfo['ClassId: ']
-                if class_id == 2:
-                    class_id = 'Car'
-                if class_id == 5:
-                    class_id = 'Bus'
+for objectInfo in objectClassPairs:
+    objectID = objectInfo['ObjectId: ']
+    class_id = objectInfo['ClassId: ']
+    if class_id == 2:  # Car
+        class_name = 'Car'
+        info_list = carInfo
+    elif class_id == 5:  # Bus
+        class_name = 'Bus'
+        info_list = busInfo
+    else:
+        continue
 
-                break
-        
-        direction = objectDirections.get(objectID, 'NA')
-        if direction > 0:
-            direction = 'Right'
-        else:
-            direction = 'Left'
-        object_ids_file.write(
-            f"Object ID: {objectID}, Class ID: {class_id}, Entered: {start_time :.2f} secs, Exited: {end_time :.2f} secs, Direction: {direction}\n")
-        
+    start_time = timeStamps[objectID]['start_time']
+    end_time = timeStamps[objectID]['end_time']
+    direction = objectDirections.get(objectID, 'NA')
+    if direction > 0:
+        direction = 'Right'
+    else:
+        direction = 'Left'
+
+    info_list.append({
+        "object_id": objectID,
+        'class_id': class_name,
+        "entered_time": start_time,
+        "exited_time": end_time,
+        "direction": direction
+    })
 
 
-# Endpoint to get object IDs, timestamps, and directions as JSON - http://127.0.0.1:5000/api/object_info
-@app.route('/api/object_info', methods=['GET'])
-def get_object_info():
-    object_info = []
-    for object_id in objectIDs:
-        for objectInfo in objectClassPairs:
-            if objectInfo['ObjectId: '] == object_id:
-                class_id = objectInfo['ClassId: ']
-                if class_id == 2:
-                    class_id = 'Car'
-                elif class_id == 5:
-                    class_id = 'Bus'
-                break
-        start_time = timeStamps[object_id]['start_time']
-        end_time = timeStamps[object_id]['end_time']
-        direction = objectDirections.get(object_id, 'NA')
-        if direction > 0:
-            direction = 'Right'
-        else:
-            direction = 'Left'
-        object_info.append({
-            "object_id": object_id,
-            'class_id': class_id,
-            "entered_time": start_time,
-            "exited_time": end_time,
-            "direction": direction
+    busOutputDirectory = os.path.join(outputDir, "BusObjectsInfo.txt")
+    with open(busOutputDirectory, 'w') as busIDsFile :
+        busIDsFile.write(f'Filmed: {creationTime}, Time: {newJustTime}\n')
+        for idx, busInfoEntry in enumerate(busInfo, start=0):
+            busIDsFile.write(
+                f"Object ID: {busInfoEntry['object_id']}, Class ID: {busInfoEntry['class_id']}, "
+                f"Entered: {busInfoEntry['entered_time']:.2f} secs, Exited: {busInfoEntry['exited_time']:.2f} secs, "
+                f"Direction: {busInfoEntry['direction']}\n")
+            
+    carOutputDirectory = os.path.join(outputDir, "CarObjectsInfo.txt")
+    with open(carOutputDirectory, 'w') as carIDsFile :
+        carIDsFile.write(f'Filmed: {creationTime}, Time: {newJustTime}\n')
+        for idx, carInfoEntry in enumerate(carInfo, start=0):
+            carIDsFile.write( f'Index: {idx}, '
+                f"Object ID: {carInfoEntry['object_id']}, Class ID: {carInfoEntry['class_id']}, "
+                f"Entered: {carInfoEntry['entered_time']:.2f} secs, Exited: {carInfoEntry['exited_time']:.2f} secs, "
+                f"Direction: {carInfoEntry['direction']}\n")
+
+# Endpoint to get object IDs, timestamps, and directions as JSON - http://127.0.0.1:5000/api/bus_info
+@app.route('/api/bus_info', methods=['GET'])
+def get_bus_info():
+    busInfoResponse = []
+    for idx, busInfoEntry in enumerate(busInfo, start=0):
+        busInfoResponse.append({
+            'index':idx,
+            'objectID':busInfoEntry['object_id'],
+            'classID':busInfoEntry['class_id'],
+            'enteredTime':busInfoEntry['entered_time'],
+            'exitiedTime':busInfoEntry['exited_time'],
+            'direction':busInfoEntry['direction'],
         })
     return jsonify(({
         "video_info": {
             "creationTime": creationTime.strftime("%Y-%m-%d %H:%M:%S"),
             "justTime": justTime
         },
-        "object_info": object_info
+        "bus_info": busInfoResponse
+    }))
+
+# Endpoint to get object IDs, timestamps, and directions as JSON - http://127.0.0.1:5000/api/car_info
+@app.route('/api/car_info', methods=['GET'])
+def get_car_info():
+    carInfoResponse = []
+    for idx, carInfoEntry in enumerate(carInfo, start=0):
+        carInfoResponse.append({
+            'index':idx,
+            'objectID':carInfoEntry['object_id'],
+            'classID':carInfoEntry['class_id'],
+            'enteredTime':carInfoEntry['entered_time'],
+            'exitiedTime':carInfoEntry['exited_time'],
+            'direction':carInfoEntry['direction'],
+        })
+    return jsonify(({
+        "video_info": {
+            "creationTime": creationTime.strftime("%Y-%m-%d %H:%M:%S"),
+            "justTime": justTime
+        },
+        "car_info": carInfoResponse
     }))
 
 
