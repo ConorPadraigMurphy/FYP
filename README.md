@@ -8,7 +8,7 @@ This is the README for Rohan and Conors Final Year Project
 
 1. Install Anaconda(python) or Python
 
-2. Installs for Tracking.py
+2. Installs for app.py
     - pip install ultralytics
     - pip install numpy
     - pip install opencv-python
@@ -28,7 +28,7 @@ This is the README for Rohan and Conors Final Year Project
 ## How to to run Flask Application
 1. Install Flask
     - pip install flask
-2. Use Command where Tracking.py is located
+2. Use Command where app.py is located
     - flask run
 
 After Tracking has ended, Open http://127.0.0.1:5000/api/car_info OR http://127.0.0.1:5000/api/bus_info in browser to see the JSON output.
