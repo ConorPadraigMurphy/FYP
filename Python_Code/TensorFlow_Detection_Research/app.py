@@ -187,12 +187,11 @@ for objectInfo in objectClassPairs:
         "direction": direction
     })
 
-
     busOutputDirectory = os.path.join(outputDir, "BusObjectsInfo.txt")
     with open(busOutputDirectory, 'w') as busIDsFile :
         busIDsFile.write(f'Filmed: {creationTime}, Time: {newJustTime}\n')
         for idx, busInfoEntry in enumerate(busInfo, start=0):
-            busIDsFile.write(
+            busIDsFile.write( f'Index: {idx}, '
                 f"Object ID: {busInfoEntry['object_id']}, Class ID: {busInfoEntry['class_id']}, "
                 f"Entered: {busInfoEntry['entered_time']:.2f} secs, Exited: {busInfoEntry['exited_time']:.2f} secs, "
                 f"Direction: {busInfoEntry['direction']}\n")
