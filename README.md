@@ -13,7 +13,9 @@ This is the README for Rohan and Conors Final Year Project
     - pip install numpy
     - pip install opencv-python
     - pip install flask
+    - pip install confluent-kafka
     - Model: YoloV8 (Ultralytics)
+    
 
 3. Installs for Detection.py -> No longer in use but still available to run in Conors-Research Folder
     - pip install tensorflow
