@@ -1,0 +1,2 @@
+Filmed: 2023-11-29 16:12:10.873988, Time: 16:11:47
+Index: 0, Object ID: 2, Class ID: Bus, Entered: 0.00 secs, Exited: 21.11 secs, Direction: Right

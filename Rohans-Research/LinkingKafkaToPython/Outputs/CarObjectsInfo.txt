@@ -1,0 +1,18 @@
+Filmed: 2023-11-29 16:12:10.873988, Time: 16:11:47
+Index: 0, Object ID: 1, Class ID: Car, Entered: 0.00 secs, Exited: 1.87 secs, Direction: Right
+Index: 1, Object ID: 3, Class ID: Car, Entered: 0.07 secs, Exited: 0.27 secs, Direction: Right
+Index: 2, Object ID: 4, Class ID: Car, Entered: 0.47 secs, Exited: 0.47 secs, Direction: Left
+Index: 3, Object ID: 5, Class ID: Car, Entered: 1.07 secs, Exited: 2.70 secs, Direction: Left
+Index: 4, Object ID: 7, Class ID: Car, Entered: 6.84 secs, Exited: 8.27 secs, Direction: Left
+Index: 5, Object ID: 9, Class ID: Car, Entered: 7.27 secs, Exited: 9.44 secs, Direction: Right
+Index: 6, Object ID: 10, Class ID: Car, Entered: 7.60 secs, Exited: 8.07 secs, Direction: Left
+Index: 7, Object ID: 11, Class ID: Car, Entered: 8.47 secs, Exited: 10.67 secs, Direction: Right
+Index: 8, Object ID: 12, Class ID: Car, Entered: 10.20 secs, Exited: 12.54 secs, Direction: Right
+Index: 9, Object ID: 14, Class ID: Car, Entered: 11.04 secs, Exited: 12.40 secs, Direction: Left
+Index: 10, Object ID: 16, Class ID: Car, Entered: 12.60 secs, Exited: 14.91 secs, Direction: Right
+Index: 11, Object ID: 17, Class ID: Car, Entered: 12.94 secs, Exited: 14.41 secs, Direction: Left
+Index: 12, Object ID: 19, Class ID: Car, Entered: 14.47 secs, Exited: 16.57 secs, Direction: Right
+Index: 13, Object ID: 21, Class ID: Car, Entered: 16.84 secs, Exited: 20.37 secs, Direction: Left
+Index: 14, Object ID: 23, Class ID: Car, Entered: 19.21 secs, Exited: 19.24 secs, Direction: Right
+Index: 15, Object ID: 24, Class ID: Car, Entered: 20.91 secs, Exited: 22.27 secs, Direction: Left
+Index: 16, Object ID: 25, Class ID: Car, Entered: 21.01 secs, Exited: 22.27 secs, Direction: Right
