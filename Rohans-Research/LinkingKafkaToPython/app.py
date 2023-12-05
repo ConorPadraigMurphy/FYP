@@ -8,29 +8,6 @@ from flask import Flask, jsonify, request, abort
 from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
-
-# Endpoint to get object IDs, timestamps, and directions as JSON - http://127.0.0.1:5000/api/bus_info
-@app.route('/api/bus_info', methods=['GET'])
-def get_bus_info():
-    busInfoResponse = []
-    for idx, busInfoEntry in enumerate(busInfo, start=0):
-        busInfoResponse.append({
-            'index':idx,
-            'objectID':busInfoEntry['object_id'],
-            'classID':busInfoEntry['class_id'],
-            'enteredTime':busInfoEntry['entered_time'],
-            'exitiedTime':busInfoEntry['exited_time'],
-            'direction':busInfoEntry['direction'],
-        })
-    return jsonify(({
-        "video_info": {
-            "creationTime": creationTime.strftime("%Y-%m-%d %H:%M:%S"),
-            "justTime": justTime
-        },
-        "bus_info": busInfoResponse
-    }))
-
-
 # Get the current directory
 current_dir = os.path.dirname(os.path.realpath(__file__))
 inputs_dir = os.path.join(current_dir, 'inputs')

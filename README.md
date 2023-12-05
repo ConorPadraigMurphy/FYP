@@ -28,11 +28,21 @@ This is the README for Rohan and Conors Final Year Project
     - model used: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md
     - model name: efficientdet_d0
 
-## How to to run Flask Application
-1. Install Flask
-    - pip install flask
-2. Use Command where app.py is located
+## How to to run  Application (Run each command in separate terminals)
+1. Start Zookeeper (Run command in the kafka_2.13 Folder)
+    - ./bin/zookeeper-server-start.sh ./config/zookeeper.properties
+2. Start Kafka (Run command in the kafka_2.13 Folder)
+    - ./bin/kafka-server-start.sh ./config/server.properties
+3. Check if Kafka topics are listed (Run command in the kafka_2.13 Folder)
+    - bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+4. If there is no topics created Create them using below commands (Run command in the kafka_2.13 Folder)
+    - bin/kafka-topics.sh --create --topic incoming-videos --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+    - bin/kafka-topics.sh --create --topic processed-videos --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+5. Use Command where app.py is located
     - flask run
+6. Run video_consumer python script
+    - python3 video_consumer.py
+7.  Run react frontend (Run command in frontend folder)
+    - npm start
 
-After Tracking has ended, Open http://127.0.0.1:5000/api/car_info OR http://127.0.0.1:5000/api/bus_info in browser to see the JSON output.
 
