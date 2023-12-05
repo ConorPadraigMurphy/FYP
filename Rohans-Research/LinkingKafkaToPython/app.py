@@ -30,28 +30,6 @@ def get_bus_info():
         "bus_info": busInfoResponse
     }))
 
-# Endpoint to get object IDs, timestamps, and directions as JSON - http://127.0.0.1:5000/api/car_info
-@app.route('/api/car_info', methods=['GET'])
-def get_car_info():
-    carInfoResponse = []
-    for idx, carInfoEntry in enumerate(carInfo, start=0):
-        carInfoResponse.append({
-            'index':idx,
-            'objectID':carInfoEntry['object_id'],
-            'classID':carInfoEntry['class_id'],
-            'enteredTime':carInfoEntry['entered_time'],
-            'exitiedTime':carInfoEntry['exited_time'],
-            'direction':carInfoEntry['direction'],
-        })
-    return jsonify(({
-        "video_info": {
-            "creationTime": creationTime.strftime("%Y-%m-%d %H:%M:%S"),
-            "justTime": justTime
-        },
-        "car_info": carInfoResponse
-    }))
-
-
 
 # Get the current directory
 current_dir = os.path.dirname(os.path.realpath(__file__))

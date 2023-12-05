@@ -4,6 +4,14 @@ import os
 import time
 from datetime import datetime
 from ultralytics import YOLO
+from pymongo import MongoClient
+
+# Mongo Connection string
+client = MongoClient("mongodb+srv://admin:admin@cluster0.rhqvnnf.mongodb.net/?retryWrites=true&w=majority")
+
+# Mongo DB and collection
+db = client["FYP"]
+collection = db["FYP"]
 
 # Kafka Consumer Configuration
 consumer_conf = {
@@ -214,12 +222,26 @@ def process_video(video_id):
                     f"Entered: {carInfoEntry['entered_time']:.2f} secs, Exited: {carInfoEntry['exited_time']:.2f} secs, "
                     f"Direction: {carInfoEntry['direction']}\n")
     
+     # Insert data into MongoDB
+    try:
+        if busInfo:  # Check if busInfo is not empty
+            collection.insert_many(busInfo)
+            print(f"Inserted bus data for video {video_id}")
+
+        if carInfo:  # Check if carInfo is not empty
+            collection.insert_many(carInfo)
+            print(f"Inserted car data for video {video_id}")
+
+    except Exception as e:
+        print(f"An error occurred while inserting data into MongoDB: {e}")
 
 
     # Clean-up after processing
     output.release()
     cap.release()
     cv2.destroyAllWindows()
+
+
 
 
 def consume_loop(consumer, topics):
