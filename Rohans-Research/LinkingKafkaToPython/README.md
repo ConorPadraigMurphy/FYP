@@ -31,10 +31,10 @@ How it works: App.py gets post requests and saves video with UUID and sends a me
 
 # To - Do
 
-- Sending final information to endpoint still not brought into this implementation 
+- Sending final information to endpoint still not brought into this implementation (Not needed anymore)
 
 - Videos replace previews video information on text
 
 - User ID will be used to id videos and track them to make it easier to track back to the user who uploaded
 
-- Send Video Data to mongo straight away
+- Send Video Data to mongo straight away (Done)

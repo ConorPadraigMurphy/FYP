@@ -14,6 +14,7 @@ This is the README for Rohan and Conors Final Year Project
     - pip install opencv-python
     - pip install flask
     - pip install confluent-kafka
+    - pip install pymongo
     - Model: YoloV8 (Ultralytics)
     
 
