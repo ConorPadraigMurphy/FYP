@@ -16,17 +16,6 @@ This is the README for Rohan and Conors Final Year Project
     - pip install confluent-kafka
     - pip install pymongo
     - Model: YoloV8 (Ultralytics)
-    
-
-3. Installs for Detection.py -> No longer in use but still available to run in Conors-Research Folder
-    - pip install tensorflow
-    - pip install opencv-python
-    - pip install numpy
-    - pip install tensorflow 
-    - pip install tensorflow-hub
-    - pip install tf-models-official
-    - model used: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md
-    - model name: efficientdet_d0
 
 ## How to to run  Application (Run each command in separate terminals)
 1. Start Zookeeper (Run command in the kafka_2.13 Folder)
