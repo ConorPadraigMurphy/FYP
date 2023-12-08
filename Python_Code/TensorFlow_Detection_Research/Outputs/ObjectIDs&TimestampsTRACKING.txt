@@ -1,5 +1,0 @@
-Filmed: 2023-11-16 17:37:50.779053, Time: 17:37:39
-Object ID: 1, Class ID: Bus, Entered: 0.00 secs, Exited: 4.30 secs, Direction: Right
-Object ID: 2, Class ID: Bus, Entered: 0.00 secs, Exited: 3.80 secs, Direction: Right
-Object ID: 3, Class ID: Car, Entered: 0.00 secs, Exited: 0.27 secs, Direction: Right
-Object ID: 4, Class ID: Car, Entered: 0.00 secs, Exited: 1.17 secs, Direction: Left
