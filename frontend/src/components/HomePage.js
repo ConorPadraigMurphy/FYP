@@ -1,5 +1,4 @@
 import * as React from "react";
-import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -12,7 +11,7 @@ function CardComponent({ title, category, content }) {
     <Card variant="outlined">
       <CardContent>
         <Typography sx={{ fontSize: 16 }} color="text.primary" gutterBottom>
-          {category}
+          <u><b>{category}</b></u>
         </Typography>
         <Typography variant="h5" component="div">
           {title}
