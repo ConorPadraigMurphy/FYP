@@ -9,7 +9,7 @@ class BusTimesPage extends React.Component {
 
     createBarChart() {
         // Get the canvas element
-        const canvas = document.getElementById('myBarChart');
+        const canvas = document.getElementById('BusBarChart');
         const ctx = canvas.getContext('2d');
 
         // Check if a chart instance already exists
@@ -68,7 +68,11 @@ class BusTimesPage extends React.Component {
             <div className="busTimes-page-content">
                 <h2>Bus Times Page</h2>
                 {/* Create a canvas element for the bar chart */}
-                <canvas id="myBarChart" width="400" height="200"></canvas>
+               
+                <div style={{ maxWidth: '1080px', margin: '0 auto' }}>
+                    {/* Create a canvas element for the line chart */}
+                    <canvas id="BusBarChart" width="400" height="200"></canvas>
+                </div>
             </div>
         );
     }
