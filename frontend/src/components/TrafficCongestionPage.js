@@ -24,7 +24,7 @@ class TrafficCongestionPage extends React.Component {
             datasets: [{
                 label: 'Vehicles Per Hour',
                 data: [10, 15, 8, 20, 12, 15, 8, 20, 12, 20, 12, 15],
-                borderColor: 'rgba(75, 192, 192, 1)',
+                borderColor: 'rgba(150, 200, 250, 1)',
                 borderWidth: 2,
                 fill: true,
             }],
