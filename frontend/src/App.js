@@ -12,7 +12,8 @@ import {
 import { FaHome } from "react-icons/fa";
 
 import HomePageContent from "./components/HomePageComponent.js";
-
+import HomeIcon from '@mui/icons-material/Home';
+import TrafficSharpIcon from '@mui/icons-material/TrafficSharp';
 
 function App() {
   return (
@@ -20,9 +21,9 @@ function App() {
       <div className="App" >
         <Navbar bg="dark" variant="dark">
           <Container>
-            <Navbar.Brand href="/">Tracking</Navbar.Brand>
+            <Navbar.Brand href="/"><TrafficSharpIcon fontSize='large'/></Navbar.Brand>
             <Nav className="me-auto">
-              <Nav.Link href="/"><FaHome/> Home</Nav.Link>
+              <Nav.Link href="/"><HomeIcon/> Home</Nav.Link>
             </Nav>
           </Container>
         </Navbar>
