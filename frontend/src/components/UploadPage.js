@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 
-class HomePageContent extends React.Component {
+class UploadPage extends React.Component {
     render() {
         return (
             <div className="home-page-content">
@@ -33,4 +33,4 @@ class HomePageContent extends React.Component {
     }
 }
 
-export default HomePageContent;
+export default UploadPage;
