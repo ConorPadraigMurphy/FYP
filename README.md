@@ -35,3 +35,7 @@ This is the README for Rohan and Conors Final Year Project
     - npm start
 
 
+
+npm install @mui/icons-material
+
+npm install @emotion/react @emotion/styled @mui/system
