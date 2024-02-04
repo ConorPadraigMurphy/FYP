@@ -5,11 +5,10 @@ const TrafficCongestionPage = () => {
   const [vehicleData, setVehicleData] = useState([]);
 
   useEffect(() => {
-    // Fetch data from MongoDB or your API endpoint
-    // You may need to adjust the endpoint and handling based on your server setup
+
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/vehicleData"); // Replace with your API endpoint
+        const response = await fetch("/api/vehicleData");
         console.log("Server Response:", response);
         const data = await response.json();
         console.log("Fetched data from server:", data);
@@ -30,7 +29,7 @@ const TrafficCongestionPage = () => {
   const createChart = () => {
     const canvas = document.getElementById("myLineChart");
     const ctx = canvas.getContext("2d");
-    console.log("Canvas context:", ctx); // Log the canvas context
+    console.log("Canvas context:", ctx); 
 
     // Destroy existing chart if it exists
     if (canvas.chart) {
@@ -39,7 +38,7 @@ const TrafficCongestionPage = () => {
 
     // Extract entered times and vehicle counts from the vehicleData
     const enteredTimes = vehicleData.map((vehicle) => vehicle.entered_time);
-    const vehicleCounts = Array(vehicleData.length).fill(1); // Assuming each entry represents one vehicle
+    const vehicleCounts = Array(vehicleData.length).fill(1); 
     console.log("Entered Times:", enteredTimes);
     console.log("Vehicle Counts:", vehicleCounts);
     const newChart = new Chart(ctx, {
