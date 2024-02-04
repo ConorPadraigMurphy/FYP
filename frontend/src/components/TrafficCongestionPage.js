@@ -5,13 +5,22 @@ const TrafficCongestionPage = () => {
   const [vehicleData, setVehicleData] = useState([]);
 
   useEffect(() => {
+    console.log("Inside useEffect");
 
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/vehicleData");
+        console.log("Fetching data...");
+        const response = await fetch("/api/vehicleData"); 
         console.log("Server Response:", response);
+
+        if (!response.ok) {
+          console.error("Server returned an error:", response.statusText);
+          return;
+        }
+
         const data = await response.json();
         console.log("Fetched data from server:", data);
+
         setVehicleData(data);
         console.log("Updated state after data processing:", data);
       } catch (error) {
@@ -29,7 +38,6 @@ const TrafficCongestionPage = () => {
   const createChart = () => {
     const canvas = document.getElementById("myLineChart");
     const ctx = canvas.getContext("2d");
-    console.log("Canvas context:", ctx); 
 
     // Destroy existing chart if it exists
     if (canvas.chart) {
@@ -38,7 +46,7 @@ const TrafficCongestionPage = () => {
 
     // Extract entered times and vehicle counts from the vehicleData
     const enteredTimes = vehicleData.map((vehicle) => vehicle.entered_time);
-    const vehicleCounts = Array(vehicleData.length).fill(1); 
+    const vehicleCounts = Array(vehicleData.length).fill(1);
     console.log("Entered Times:", enteredTimes);
     console.log("Vehicle Counts:", vehicleCounts);
     const newChart = new Chart(ctx, {

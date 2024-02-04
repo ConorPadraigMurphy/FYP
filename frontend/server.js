@@ -1,12 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const app = express();
 const PORT = 3001;
 
+app.use(cors());
+
 // Use environment variables for sensitive information
-const MONGODB_URI =
-  "mongodb+srv://admin:admin@cluster0.rhqvnnf.mongodb.net/FYP";
+const MONGODB_URI = "mongodb+srv://admin:admin@cluster0.rhqvnnf.mongodb.net/";
 
 // Connect to MongoDB
 mongoose.connect(MONGODB_URI, {
@@ -24,7 +26,7 @@ const vehicleSchema = new mongoose.Schema({
 });
 
 // Create a mongoose model
-const Vehicle = mongoose.model("Vehicle", vehicleSchema);
+const Vehicle = mongoose.model("vehicles", vehicleSchema, "vehicles");
 
 // Express route to get vehicle data
 app.get("/api/vehicleData", async (req, res) => {
