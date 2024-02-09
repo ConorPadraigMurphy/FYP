@@ -31,10 +31,11 @@ const TrafficCongestionPage = () => {
     fetchData();
   }, []);
 
+ 
   useEffect(() => {
     createChart();
   }, [vehicleData]);
-
+  
   const createChart = () => {
     const canvas = document.getElementById("myLineChart");
     const ctx = canvas.getContext("2d");
@@ -45,15 +46,15 @@ const TrafficCongestionPage = () => {
     }
 
     // Extract entered times and vehicle counts from the vehicleData
-    const enteredTimes = vehicleData.map((vehicle) => vehicle.timeStamp);
+    const timestamp = vehicleData.map((vehicle) => vehicle.entered_time);
     const vehicleCounts = Array(vehicleData.length).fill(1);
-    console.log("Entered Times:", enteredTimes);
+    console.log("times:", timestamp);
     console.log("Vehicle Counts:", vehicleCounts);
-    
+
     const newChart = new Chart(ctx, {
       type: "line",
       data: {
-        labels: enteredTimes,
+        labels: timestamp,
         datasets: [
           {
             label: "Number of Vehicles",
@@ -65,6 +66,7 @@ const TrafficCongestionPage = () => {
         ],
       },
       options: {
+        responsive: true,
         scales: {
           x: {
             type: "linear",

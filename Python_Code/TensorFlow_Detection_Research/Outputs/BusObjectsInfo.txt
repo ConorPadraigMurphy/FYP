@@ -1,2 +1,2 @@
-Filmed: 2024-02-09 21:08:13.247257, Time: 21:07:43
-Index: 0, Object ID: 23, Class ID: Bus, Entered: 12.15 secs, Exited: 25.13 secs, Direction: Right
+Filmed: 2024-02-09 22:03:30.806603, Time: 22:03:00
+Index: 0, Object ID: 9, Class ID: Bus, Entered: 12.15 secs, Exited: 25.13 secs, Direction: Right

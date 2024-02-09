@@ -200,18 +200,11 @@ def process_video(video_id):
         else:
             direction = 'Left'
 
-        newJustTime_str = str(newJustTime)
-       # Convert newJustTime to a datetime object
-        newJustTime_dt = datetime.strptime(newJustTime_str, "%H:%M:%S")
+        #Work on entered_time being seconds not hours
+        hoursStr = newJustTime[:2]
+        hoursFloat = float(hoursStr)
+        combinedTime = hoursFloat + start_time
 
-        # Convert start_time to a timedelta object
-        start_time_td = timedelta(hours=start_time)
-
-        # Add the two time values
-        result_time_dt = newJustTime_dt + start_time_td
-        print("JustTime", newJustTime_dt, "Start TIme", start_time_td)
-        # Format the result_time_dt as a string in the format "HH:MM"
-        result_time_str = result_time_dt.strftime("%H:%M")
 
 
         info_list.append({
@@ -220,7 +213,7 @@ def process_video(video_id):
             'entered_time': start_time,
             'exited_time': end_time,
             'direction': direction,
-            'timestamp':result_time_str
+            'timestamp':combinedTime
         })
 
 

@@ -33,7 +33,7 @@ const vehicleSchema = new mongoose.Schema({
   entered_time: Number,
   exited_time: Number,
   direction: String,
-  timeStamp: String,
+  timestamp: Number,
 });
 
 // Create a mongoose model
