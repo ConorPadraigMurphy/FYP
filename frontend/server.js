@@ -1,20 +1,29 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-
+const express = require('express');
 const app = express();
-const PORT = 3001;
-
-app.use(cors());
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const port = 3001;
 
 // Use environment variables for sensitive information
-const MONGODB_URI = "mongodb+srv://admin:admin@cluster0.rhqvnnf.mongodb.net/";
+const MONGO_URI = 'mongodb+srv://admin:admin@cluster0.rhqvnnf.mongodb.net/FYP?retryWrites=true&w=majority';
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cors());
+
+mongoose.set('strictQuery', true);
 
 // Connect to MongoDB
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+async function main() {
+  await mongoose.connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  console.log('Connected to MongoDB successfully');
+}
+
+main().catch(err => console.log(err));
 
 // Define the vehicle schema
 const vehicleSchema = new mongoose.Schema({
@@ -26,21 +35,22 @@ const vehicleSchema = new mongoose.Schema({
 });
 
 // Create a mongoose model
-const Vehicle = mongoose.model("vehicles", vehicleSchema, "vehicles");
+const Vehicle = mongoose.model('Vehicle', vehicleSchema, 'FYP'); 
 
 // Express route to get vehicle data
-app.get("/api/vehicleData", async (req, res) => {
+app.get('/api/vehicleData', async (req, res) => {
   try {
     // Fetch all vehicle data from MongoDB
-    const vehicleData = await Vehicle.find();
-    res.json(vehicleData);
+    const data = await Vehicle.find({});
+    console.log("Data retrieved:", data); 
+    res.json(data);
   } catch (error) {
-    console.error("Error fetching vehicle data:", error);
+    console.error('Error fetching vehicle data:', error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
