@@ -10,7 +10,7 @@ const TrafficCongestionPage = () => {
     const fetchData = async () => {
       try {
         console.log("Fetching data...");
-        const response = await fetch("/api/vehicleData"); 
+        const response = await fetch("http://localhost:3001/api/vehicleData");
         console.log("Server Response:", response);
 
         if (!response.ok) {
@@ -45,10 +45,11 @@ const TrafficCongestionPage = () => {
     }
 
     // Extract entered times and vehicle counts from the vehicleData
-    const enteredTimes = vehicleData.map((vehicle) => vehicle.entered_time);
+    const enteredTimes = vehicleData.map((vehicle) => vehicle.timeStamp);
     const vehicleCounts = Array(vehicleData.length).fill(1);
     console.log("Entered Times:", enteredTimes);
     console.log("Vehicle Counts:", vehicleCounts);
+    
     const newChart = new Chart(ctx, {
       type: "line",
       data: {

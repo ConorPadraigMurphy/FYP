@@ -1,18 +1,9 @@
-Filmed: 2023-12-05 22:28:31.716862, Time: 22:28:08
-Index: 0, Object ID: 1, Class ID: Car, Entered: 0.03 secs, Exited: 22.27 secs, Direction: Right
-Index: 1, Object ID: 3, Class ID: Car, Entered: 0.03 secs, Exited: 22.27 secs, Direction: Right
-Index: 2, Object ID: 4, Class ID: Car, Entered: 0.47 secs, Exited: 22.27 secs, Direction: Left
-Index: 3, Object ID: 5, Class ID: Car, Entered: 1.07 secs, Exited: 22.27 secs, Direction: Left
-Index: 4, Object ID: 7, Class ID: Car, Entered: 6.84 secs, Exited: 22.27 secs, Direction: Left
-Index: 5, Object ID: 9, Class ID: Car, Entered: 7.27 secs, Exited: 22.27 secs, Direction: Right
-Index: 6, Object ID: 10, Class ID: Car, Entered: 7.60 secs, Exited: 22.27 secs, Direction: Left
-Index: 7, Object ID: 11, Class ID: Car, Entered: 8.47 secs, Exited: 22.27 secs, Direction: Right
-Index: 8, Object ID: 12, Class ID: Car, Entered: 10.20 secs, Exited: 22.27 secs, Direction: Right
-Index: 9, Object ID: 14, Class ID: Car, Entered: 11.04 secs, Exited: 22.27 secs, Direction: Left
-Index: 10, Object ID: 16, Class ID: Car, Entered: 12.60 secs, Exited: 22.27 secs, Direction: Right
-Index: 11, Object ID: 17, Class ID: Car, Entered: 12.94 secs, Exited: 22.27 secs, Direction: Left
-Index: 12, Object ID: 19, Class ID: Car, Entered: 14.47 secs, Exited: 22.27 secs, Direction: Right
-Index: 13, Object ID: 21, Class ID: Car, Entered: 16.84 secs, Exited: 22.27 secs, Direction: Left
-Index: 14, Object ID: 23, Class ID: Car, Entered: 19.21 secs, Exited: 22.27 secs, Direction: Right
-Index: 15, Object ID: 24, Class ID: Car, Entered: 20.91 secs, Exited: 22.27 secs, Direction: Left
-Index: 16, Object ID: 25, Class ID: Car, Entered: 21.01 secs, Exited: 22.27 secs, Direction: Right
+Filmed: 2024-02-09 21:08:13.247257, Time: 21:07:43
+Index: 0, Object ID: 15, Class ID: Car, Entered: 0.10 secs, Exited: 25.13 secs,Direction: Right
+Index: 1, Object ID: 16, Class ID: Car, Entered: 0.33 secs, Exited: 25.13 secs,Direction: Right
+Index: 2, Object ID: 17, Class ID: Car, Entered: 2.67 secs, Exited: 25.13 secs,Direction: Right
+Index: 3, Object ID: 18, Class ID: Car, Entered: 3.77 secs, Exited: 25.13 secs,Direction: Right
+Index: 4, Object ID: 19, Class ID: Car, Entered: 5.91 secs, Exited: 25.13 secs,Direction: Right
+Index: 5, Object ID: 20, Class ID: Car, Entered: 7.87 secs, Exited: 25.13 secs,Direction: Right
+Index: 6, Object ID: 21, Class ID: Car, Entered: 9.01 secs, Exited: 25.13 secs,Direction: Left
+Index: 7, Object ID: 22, Class ID: Car, Entered: 10.51 secs, Exited: 25.13 secs,Direction: Right

@@ -2,12 +2,13 @@ from confluent_kafka import Consumer, KafkaException
 import cv2
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from ultralytics import YOLO
 from pymongo import MongoClient
 
 # Mongo Connection string
 client = MongoClient("mongodb+srv://admin:admin@cluster0.rhqvnnf.mongodb.net/?retryWrites=true&w=majority")
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Mongo DB and collection
 db = client["FYP"]
@@ -158,6 +159,7 @@ def process_video(video_id):
             if numeric_direction:
                 avgDirection = sum(numeric_direction) / len(numeric_direction)
                 directionCategory = 'Right' if avgDirection > 0 else 'Left'
+                start_time = timeStamps[objectID]['start_time']
 
                 # Add object direction information to busInfo and carInfo
                 if objectIDs[track_id] == 2:
@@ -165,14 +167,16 @@ def process_video(video_id):
                         'TrackId': track_id,
                         'ClassId': 2,
                         'AvgDirection': avgDirection,
-                        'DirectionCategory': directionCategory
+                        'DirectionCategory': directionCategory,
+                        'timestamp': chartTimeStamp
                     })
                 else:
                     carInfo.append({
                         'TrackId': track_id,
                         'ClassId': 5,
                         'AvgDirection': avgDirection,
-                        'DirectionCategory': directionCategory
+                        'DirectionCategory': directionCategory,
+                        'timestamp': chartTimeStamp
                     })
                     
     # Write all object IDs and Timestamps of when the object appears and when the object exits the video to a text file
@@ -196,31 +200,49 @@ def process_video(video_id):
         else:
             direction = 'Left'
 
+        newJustTime_str = str(newJustTime)
+       # Convert newJustTime to a datetime object
+        newJustTime_dt = datetime.strptime(newJustTime_str, "%H:%M:%S")
+
+        # Convert start_time to a timedelta object
+        start_time_td = timedelta(hours=start_time)
+
+        # Add the two time values
+        result_time_dt = newJustTime_dt + start_time_td
+        print("JustTime", newJustTime_dt, "Start TIme", start_time_td)
+        # Format the result_time_dt as a string in the format "HH:MM"
+        result_time_str = result_time_dt.strftime("%H:%M")
+
+
         info_list.append({
-            "object_id": objectID,
+            'object_id': objectID,
             'class_id': class_name,
-            "entered_time": start_time,
-            "exited_time": end_time,
-            "direction": direction
+            'entered_time': start_time,
+            'exited_time': end_time,
+            'direction': direction,
+            'timestamp':result_time_str
         })
+
+
 
         busOutputDirectory = os.path.join(outputDir, "BusObjectsInfo.txt")
         with open(busOutputDirectory, 'w') as busIDsFile :
             busIDsFile.write(f'Filmed: {creationTime}, Time: {newJustTime}\n')
             for idx, busInfoEntry in enumerate(busInfo, start=0):
-                busIDsFile.write( f'Index: {idx}, '
+                busIDsFile.write(f'Index: {idx}, '
                     f"Object ID: {busInfoEntry['object_id']}, Class ID: {busInfoEntry['class_id']}, "
                     f"Entered: {busInfoEntry['entered_time']:.2f} secs, Exited: {busInfoEntry['exited_time']:.2f} secs, "
                     f"Direction: {busInfoEntry['direction']}\n")
+
                 
         carOutputDirectory = os.path.join(outputDir, "CarObjectsInfo.txt")
         with open(carOutputDirectory, 'w') as carIDsFile :
             carIDsFile.write(f'Filmed: {creationTime}, Time: {newJustTime}\n')
             for idx, carInfoEntry in enumerate(carInfo, start=0):
-                carIDsFile.write( f'Index: {idx}, '
-                    f"Object ID: {carInfoEntry['object_id']}, Class ID: {carInfoEntry['class_id']}, "
-                    f"Entered: {carInfoEntry['entered_time']:.2f} secs, Exited: {carInfoEntry['exited_time']:.2f} secs, "
-                    f"Direction: {carInfoEntry['direction']}\n")
+                carIDsFile.write(f'Index: {idx}, '
+                    f'Object ID: {carInfoEntry["object_id"]}, Class ID: {carInfoEntry["class_id"]}, '
+                    f'Entered: {carInfoEntry["entered_time"]:.2f} secs, Exited: {carInfoEntry["exited_time"]:.2f} secs,'
+                    f'Direction: {carInfoEntry["direction"]}\n')
     
      # Insert data into MongoDB
     try:
