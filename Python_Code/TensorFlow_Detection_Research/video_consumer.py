@@ -201,11 +201,14 @@ def process_video(video_id):
             direction = 'Left'
 
         #Work on entered_time being seconds not hours
-        hoursStr = newJustTime[:2]
-        hoursFloat = float(hoursStr)
-        combinedTime = hoursFloat + start_time
+        timeStr = newJustTime[:2]
+        timeFloat = float(timeStr)
+        timeSeconds = timeFloat * 3600
+        combinedTime = timeSeconds + start_time
 
-
+        hours = int(combinedTime/3600)
+        minutes = int((combinedTime - hours * 3600)/60)
+        combinedTimeFloat = float(f"{hours}.{minutes}")
 
         info_list.append({
             'object_id': objectID,
@@ -213,7 +216,7 @@ def process_video(video_id):
             'entered_time': start_time,
             'exited_time': end_time,
             'direction': direction,
-            'timestamp':combinedTime
+            'timestamp':combinedTimeFloat
         })
 
 
