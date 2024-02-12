@@ -1,4 +1,4 @@
-Filmed: 2024-02-12 09:29:15.777319, Time: 09:29:04
+Filmed: 2024-02-12 09:41:13.075491, Time: 09:41:02
 Index: 0, Object ID: 3, Class ID: Car, Entered: 0.03 secs, Exited: 10.01 secs, Direction: Right
 Index: 1, Object ID: 4, Class ID: Car, Entered: 0.20 secs, Exited: 10.01 secs, Direction: Left
 Index: 2, Object ID: 5, Class ID: Car, Entered: 5.87 secs, Exited: 10.01 secs, Direction: Right
