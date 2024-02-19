@@ -40,7 +40,6 @@ This is the README for Rohan and Conors Final Year Project
 
 **Windows**
 
-<<<<<<< HEAD
 1. Start Zookeeper (windows)
    .\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
 
@@ -62,9 +61,3 @@ This is the README for Rohan and Conors Final Year Project
 
 7. Run react frontend in frontend folder
    npm start
-=======
-
-npm install @mui/icons-material
-
-npm install @emotion/react @emotion/styled @mui/system
->>>>>>> a1adb9e89070e4b4c3fa6b6452ce9149abe7b756
