@@ -92,6 +92,7 @@ const TrafficCongestionPage = () => {
     const uniqueTimestamps = [
       ...new Set(data.map((vehicle) => vehicle.timestamp)),
     ];
+    uniqueTimestamps.sort((a, b) => a - b);
     return uniqueTimestamps;
   };
 
