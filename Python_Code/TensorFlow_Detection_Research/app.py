@@ -3,11 +3,11 @@ import os
 from datetime import datetime
 from confluent_kafka import Producer
 import uuid
-
+from flask_cors import CORS
 from flask import Flask, jsonify, request, abort
 from werkzeug.utils import secure_filename
 app = Flask(__name__)
-
+CORS(app)
 # Get the current directory
 current_dir = os.path.dirname(os.path.realpath(__file__))
 inputs_dir = os.path.join(current_dir, 'inputs')

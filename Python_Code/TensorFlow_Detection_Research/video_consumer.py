@@ -2,7 +2,7 @@ from confluent_kafka import Consumer, KafkaException
 import cv2
 import os
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from ultralytics import YOLO
 from pymongo import MongoClient
 
@@ -220,25 +220,25 @@ def process_video(video_id):
         })
 
 
-
-        busOutputDirectory = os.path.join(outputDir, "BusObjectsInfo.txt")
-        with open(busOutputDirectory, 'w') as busIDsFile :
-            busIDsFile.write(f'Filmed: {creationTime}, Time: {newJustTime}\n')
-            for idx, busInfoEntry in enumerate(busInfo, start=0):
-                busIDsFile.write(f'Index: {idx}, '
-                    f"Object ID: {busInfoEntry['object_id']}, Class ID: {busInfoEntry['class_id']}, "
-                    f"Entered: {busInfoEntry['entered_time']:.2f} secs, Exited: {busInfoEntry['exited_time']:.2f} secs, "
-                    f"Direction: {busInfoEntry['direction']}\n")
+        # Commented out seeing as there no need for constant updates to text files now that db is connected
+        # busOutputDirectory = os.path.join(outputDir, "BusObjectsInfo.txt")
+        # with open(busOutputDirectory, 'w') as busIDsFile :
+        #     busIDsFile.write(f'Filmed: {creationTime}, Time: {newJustTime}\n')
+        #     for idx, busInfoEntry in enumerate(busInfo, start=0):
+        #         busIDsFile.write(f'Index: {idx}, '
+        #             f"Object ID: {busInfoEntry['object_id']}, Class ID: {busInfoEntry['class_id']}, "
+        #             f"Entered: {busInfoEntry['entered_time']:.2f} secs, Exited: {busInfoEntry['exited_time']:.2f} secs, "
+        #             f"Direction: {busInfoEntry['direction']}\n")
 
                 
-        carOutputDirectory = os.path.join(outputDir, "CarObjectsInfo.txt")
-        with open(carOutputDirectory, 'w') as carIDsFile :
-            carIDsFile.write(f'Filmed: {creationTime}, Time: {newJustTime}\n')
-            for idx, carInfoEntry in enumerate(carInfo, start=0):
-                carIDsFile.write(f'Index: {idx}, '
-                    f'Object ID: {carInfoEntry["object_id"]}, Class ID: {carInfoEntry["class_id"]}, '
-                    f'Entered: {carInfoEntry["entered_time"]:.2f} secs, Exited: {carInfoEntry["exited_time"]:.2f} secs,'
-                    f'Direction: {carInfoEntry["direction"]}\n')
+        # carOutputDirectory = os.path.join(outputDir, "CarObjectsInfo.txt")
+        # with open(carOutputDirectory, 'w') as carIDsFile :
+        #     carIDsFile.write(f'Filmed: {creationTime}, Time: {newJustTime}\n')
+        #     for idx, carInfoEntry in enumerate(carInfo, start=0):
+        #         carIDsFile.write(f'Index: {idx}, '
+        #             f'Object ID: {carInfoEntry["object_id"]}, Class ID: {carInfoEntry["class_id"]}, '
+        #             f'Entered: {carInfoEntry["entered_time"]:.2f} secs, Exited: {carInfoEntry["exited_time"]:.2f} secs,'
+        #             f'Direction: {carInfoEntry["direction"]}\n')
     
      # Insert data into MongoDB
     try:
