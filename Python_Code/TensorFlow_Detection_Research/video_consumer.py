@@ -1,10 +1,11 @@
-from confluent_kafka import Consumer, KafkaException
+from confluent_kafka import Consumer, KafkaException, KafkaError
 import cv2
 import os
 import time
 from datetime import datetime
 from ultralytics import YOLO
 from pymongo import MongoClient
+import json
 
 # Mongo Connection string
 client = MongoClient("mongodb+srv://admin:admin@cluster0.rhqvnnf.mongodb.net/?retryWrites=true&w=majority")
@@ -31,7 +32,8 @@ outputDir = 'Outputs'
 inputDir = 'Inputs'
 os.makedirs(outputDir, exist_ok=True)
 
-def process_video(video_id):
+def process_video(video_id, location_data):
+    print(f"Location Data: {location_data}")
     busInfo, carInfo = [], []
     vidInputDir = os.path.join(inputDir, f"{video_id}.mp4")
     if not os.path.exists(vidInputDir):
@@ -240,7 +242,13 @@ def process_video(video_id):
         #             f'Entered: {carInfoEntry["entered_time"]:.2f} secs, Exited: {carInfoEntry["exited_time"]:.2f} secs,'
         #             f'Direction: {carInfoEntry["direction"]}\n')
     
-     # Insert data into MongoDB
+    # Adding location to infos
+    for info in busInfo + carInfo:
+        info['address'] = location_data.get('address', '')
+        info['latitude'] = location_data.get('latitude', '')
+        info['longitude'] = location_data.get('longitude', '')
+
+    # Insert data into MongoDB
     try:
         if busInfo:  # Check if busInfo is not empty
             collection.insert_many(busInfo)
@@ -259,38 +267,44 @@ def process_video(video_id):
     cap.release()
     cv2.destroyAllWindows()
 
-
-
-
 def consume_loop(consumer, topics):
     try:
         # Subscribe the Kafka consumer to a list of topics
         consumer.subscribe(topics)
+
         while True:
             msg = consumer.poll(timeout=1.0)
-            # If no message is received, continue to the next iteration
-            if msg is None: 
-                continue
+            if msg is None:
+                continue  # Continue the loop if no message is received
 
-            # Check if the message is an error
             if msg.error():
-                # If the error is EOF (End Of File), log it but don't raise an exception
-                if msg.error().code() == KafkaException._PARTITION_EOF:
-                    sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
-                                     (msg.topic(), msg.partition(), msg.offset()))
-                # For all other errors, raise an exception
-                elif msg.error():
+                # Correctly handle partition EOF using KafkaError
+                if msg.error().code() == KafkaError._PARTITION_EOF:
+                    print('%% %s [%d] reached end at offset %d\n' %
+                          (msg.topic(), msg.partition(), msg.offset()))
+                else:
                     raise KafkaException(msg.error())
             else:
-                # Decode the message value (assuming it's a UTF-8 encoded string)
-                video_id = msg.value().decode('utf-8')
-                # Call the process_video function with the extracted video_id
-                process_video(video_id)
-    # Finally block to ensure the consumer is closed properly
+                # Successfully received a message
+                # Deserialize the message value from JSON format
+                message_data = json.loads(msg.value().decode('utf-8'))
+                
+                # Extract the video ID and location data from the message
+                video_id = message_data['video_id']
+                location_data = {
+                    'address': message_data.get('address', ''),
+                    'latitude': message_data.get('latitude', ''),
+                    'longitude': message_data.get('longitude', '')
+                }
+                
+                # Pass the video_id and location_data to your video processing function
+                process_video(video_id, location_data)
     finally:
         # Close the consumer to commit final offsets and free up resources
         consumer.close()
 
 if __name__ == '__main__':
-    consume_loop(consumer, ['incoming-videos'])
-
+    # List of topics to subscribe to
+    topics = ['incoming-videos']
+    # Start consuming messages
+    consume_loop(consumer, topics)

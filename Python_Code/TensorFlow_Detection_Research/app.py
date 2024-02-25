@@ -7,6 +7,9 @@ from flask_cors import CORS
 from flask import Flask, jsonify, request, abort
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
+import json
+
+
 app = Flask(__name__)
 CORS(app)
 # Get the current directory
@@ -28,14 +31,23 @@ def upload_video():
     filepath = os.path.join(inputs_dir, filename)
     file.save(filepath)
 
+    # Message with video_id and location data
+    message = json.dumps({
+        'video_id': video_id,
+        'address': request.form['address'],
+        'latitude': request.form['latitude'],
+        'longitude': request.form['longitude']
+    })
+
+
     # Produce the video ID to Kafka
     try:
-        producer.produce('incoming-videos', video_id)
+        producer.produce('incoming-videos', message)
         producer.flush()
     except Exception as e:
         return jsonify({'error': str(e)})
 
-    return jsonify({'message': 'Video uploaded successfully.'})
+    return jsonify({'message': 'Video uploaded successfully, video_id: ' + video_id})
 
 
 # Kafka configuration
