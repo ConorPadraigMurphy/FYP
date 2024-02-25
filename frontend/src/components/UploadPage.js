@@ -39,23 +39,21 @@ class UploadPage extends React.Component {
         uploadStatus: null, // Track the upload status
         selectedAddress: null, // Store the selected address from search
         mapCenter: {
-            lat: 53.349805,
-            lng: -6.26031  
+            lat: 53.349805, // Default center of the map
+            lng: -6.26031
         },
-        markerPosition: null // Store marker position for user-selected location
+        markerPosition: null, // Store marker position for user-selected location
+        coordinates: null // For development purposes, display the marker coordinates
     };
 
-    // Callback when the search box component is loaded
     onSearchBoxLoaded = ref => {
         this.searchBox = ref;
     };
 
-    // Handle the selection of a place using the search box
     onPlacesChanged = () => {
         const places = this.searchBox.getPlaces();
         if (places && places.length > 0) {
             const location = places[0].geometry.location;
-            // Update state with the selected address and move map & marker to that location
             this.setState({
                 selectedAddress: places[0]?.formatted_address || 'No address selected',
                 mapCenter: {
@@ -65,27 +63,37 @@ class UploadPage extends React.Component {
                 markerPosition: {
                     lat: location.lat(),
                     lng: location.lng()
-                }
+                },
+                coordinates: `Lat: ${location.lat()}, Lng: ${location.lng()}` // Update coordinates for dev purposes
             });
         }
     };
 
-    // Handle map click to allow user to drop a pin
     onMapClick = (event) => {
-        // Update the marker position based on where the user clicked on the map
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
+
         this.setState({
-            markerPosition: {
-                lat: event.latLng.lat(),
-                lng: event.latLng.lng()
-            },
-            mapCenter: {
-                lat: event.latLng.lat(),
-                lng: event.latLng.lng()
-            }
+            markerPosition: { lat, lng },
+            mapCenter: { lat, lng },
         });
+
+        this.updateAddressFromCoordinates(lat, lng);
     };
 
-    // Render the map with a search box and a marker for the selected location
+    onMarkerDragEnd = (event) => {
+        const newLat = event.latLng.lat();
+        const newLng = event.latLng.lng();
+
+        this.setState({
+            markerPosition: { lat: newLat, lng: newLng },
+            mapCenter: { lat: newLat, lng: newLng },
+        });
+
+        this.updateAddressFromCoordinates(newLat, newLng);
+    };
+
+
     renderMap() {
         return (
             <LoadScript
@@ -125,12 +133,40 @@ class UploadPage extends React.Component {
                     {this.state.markerPosition && (
                         <Marker
                             position={this.state.markerPosition} // Show marker at selected or clicked location
+                            draggable={true} // Allow marker to be draggable
+                            onDragEnd={this.onMarkerDragEnd} // Update location upon dragging
                         />
                     )}
                 </GoogleMap>
             </LoadScript>
         );
     }
+
+    updateAddressFromCoordinates = (lat, lng) => {
+        const geocoder = new window.google.maps.Geocoder();
+
+        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+            if (status === 'OK') {
+                if (results[0]) {
+                    this.setState({
+                        selectedAddress: results[0].formatted_address,
+                        coordinates: `Lat: ${lat}, Lng: ${lng}`,
+                    });
+                } else {
+                    console.log('No results found');
+                    this.setState({
+                        selectedAddress: 'No address found',
+                    });
+                }
+            } else {
+                console.log('Geocoder failed due to: ' + status);
+                this.setState({
+                    selectedAddress: 'Failed to get address',
+                });
+            }
+        });
+    };
+
 
     render() {
         return (
@@ -156,13 +192,15 @@ class UploadPage extends React.Component {
                     </p>
                 )}
                 {this.state.selectedAddress && (
-                    <p>Selected Address: {this.state.selectedAddress}</p> // Display the selected address
+                    <p>Selected Address: {this.state.selectedAddress}</p> // Display the selected address or coordinates for dev purposes
+                )}
+                {this.state.coordinates && (
+                    <p>Coordinates: {this.state.coordinates}</p> // Display the current coordinates for development purposes
                 )}
             </CenteredContainer>
         );
     }
 
-    // Handle the video file upload
     handleVideoUpload = (event) => {
         const file = event.target.files[0];
         if (!file) {
@@ -174,6 +212,9 @@ class UploadPage extends React.Component {
         formData.append('file', file); // Add the video file to the form data
         if (this.state.selectedAddress) {
             formData.append('address', this.state.selectedAddress); // Include the selected address if available
+            // Also include the coordinates
+            formData.append('latitude', this.state.markerPosition.lat.toString());
+            formData.append('longitude', this.state.markerPosition.lng.toString());
         }
 
         // Perform the upload via axios
@@ -183,11 +224,11 @@ class UploadPage extends React.Component {
             },
         })
             .then((response) => {
-                console.log('Video and address uploaded successfully', response.data);
+                console.log('Video, address, and coordinates uploaded successfully', response.data);
                 this.setState({ uploadStatus: 'success' }); // Update upload status on success
             })
             .catch((error) => {
-                console.error('Error uploading video and address', error);
+                console.error('Error uploading video, address, and coordinates', error);
                 this.setState({ uploadStatus: 'error' }); // Update upload status on failure
             });
     };
