@@ -8,7 +8,7 @@ from pymongo import MongoClient
 import json
 
 # Mongo Connection string
-client = MongoClient("mongodb+srv://admin:admin@cluster0.rhqvnnf.mongodb.net/?retryWrites=true&w=majority")
+client = MongoClient({process.env.MONGO_API_KEY})
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Mongo DB and collection

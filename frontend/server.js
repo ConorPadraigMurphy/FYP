@@ -6,8 +6,7 @@ const mongoose = require("mongoose");
 const port = 3001;
 
 // Use environment variables for sensitive information
-const MONGO_URI =
-  "mongodb+srv://admin:admin@cluster0.rhqvnnf.mongodb.net/FYP?retryWrites=true&w=majority";
+const MONGO_URI = "{process.env.MONGO_API_KEY}";
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
