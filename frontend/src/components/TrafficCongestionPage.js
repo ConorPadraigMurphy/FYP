@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Chart from "chart.js/auto";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 const TrafficCongestionPage = () => {
   const [vehicleData, setVehicleData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [address, setAddress] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,17 +26,45 @@ const TrafficCongestionPage = () => {
 
         const data = await response.json();
         setVehicleData(data);
+        setFilteredData(filterDataByAddress(data, address));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [address]);
 
   useEffect(() => {
     createChart();
-  }, [vehicleData]);
+  }, [selectedLocation]);
+
+  const filterDataByAddress = (data, address) => {
+    if (!address) {
+      return data;
+    }
+
+    return data.filter((vehicle) => vehicle.address.includes(address));
+  };
+
+  const groupDataByLocation = (data) => {
+    const groupedData = {};
+    data.forEach((vehicle) => {
+      const locationKey = `${vehicle.latitude}_${vehicle.longitude}`;
+      if (!groupedData[locationKey]) {
+        groupedData[locationKey] = {
+          location: {
+            lat: parseFloat(vehicle.latitude),
+            lng: parseFloat(vehicle.longitude),
+          },
+          address: vehicle.address,
+          timestamps: [],
+        };
+      }
+      groupedData[locationKey].timestamps.push(vehicle.timestamp);
+    });
+    return Object.values(groupedData);
+  };
 
   const createChart = () => {
     const canvas = document.getElementById("myLineChart");
@@ -44,62 +76,65 @@ const TrafficCongestionPage = () => {
     }
 
     if (canvas.chart) {
-      canvas.chart.data.labels = getUniqueTimestamps(vehicleData);
-      canvas.chart.data.datasets[0].data = getVehicleCounts(vehicleData);
+      canvas.chart.data.labels = getUniqueTimestamps(
+        selectedLocation.timestamps
+      );
+      canvas.chart.data.datasets[0].data = getVehicleCounts(
+        selectedLocation.timestamps
+      );
       canvas.chart.update();
     } else {
-      const newChart = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels: getUniqueTimestamps(vehicleData),
-          datasets: [
-            {
-              label: "Number of Vehicles",
-              data: getVehicleCounts(vehicleData),
-              borderColor: "rgba(150, 200, 250, 1)",
-              borderWidth: 2,
-              fill: true,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          scales: {
-            xAxes: [
+      if (selectedLocation) {
+        const newChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: getUniqueTimestamps(selectedLocation.timestamps),
+            datasets: [
               {
-                type: "linear",
-                position: "bottom",
-                display: true,
-              },
-            ],
-            yAxes: [
-              {
-                display: true,
-                ticks: {
-                  beginAtZero: true,
-                },
+                label: "Number of Vehicles",
+                data: getVehicleCounts(selectedLocation.timestamps),
+                borderColor: "rgba(150, 200, 250, 1)",
+                borderWidth: 2,
+                fill: true,
               },
             ],
           },
-        },
-      });
+          options: {
+            responsive: true,
+            scales: {
+              xAxes: [
+                {
+                  type: "linear",
+                  position: "bottom",
+                  display: true,
+                },
+              ],
+              yAxes: [
+                {
+                  display: true,
+                  ticks: {
+                    beginAtZero: true,
+                  },
+                },
+              ],
+            },
+          },
+        });
 
-      canvas.chart = newChart;
+        canvas.chart = newChart;
+      }
     }
   };
 
   const getUniqueTimestamps = (data) => {
-    const uniqueTimestamps = [
-      ...new Set(data.map((vehicle) => vehicle.timestamp)),
-    ];
+    const uniqueTimestamps = [...new Set(data.map((timestamp) => timestamp))];
     uniqueTimestamps.sort((a, b) => a - b);
     return uniqueTimestamps;
   };
 
   const getVehicleCounts = (data) => {
     const timestampCounts = {};
-    data.forEach((vehicle) => {
-      const timestamp = vehicle.timestamp;
+    data.forEach((timestamp) => {
       timestampCounts[timestamp] = (timestampCounts[timestamp] || 0) + 1;
     });
 
@@ -109,14 +144,49 @@ const TrafficCongestionPage = () => {
     return vehicleCounts;
   };
 
+  const handleMarkerClick = (location) => {
+    setSelectedLocation(location);
+  };
+
+  const renderGoogleMap = () => {
+    const groupedLocations = groupDataByLocation(filteredData);
+    return (
+      <LoadScript googleMapsApiKey="AIzaSyBJ39gTzB4yRuN_JTevio4hEcJYSgM8B3o">
+        <GoogleMap
+          mapContainerStyle={{ height: "400px", width: "100%" }}
+          center={{ lat: 53.274, lng: -9.0568 }}
+          zoom={10}
+        >
+          {groupedLocations.map((location) => (
+            <Marker
+              key={`${location.location.lat}_${location.location.lng}`}
+              position={location.location}
+              title={location.address}
+              onClick={() => handleMarkerClick(location)}
+            />
+          ))}
+        </GoogleMap>
+      </LoadScript>
+    );
+  };
+
   return (
     <div className="trafficCongestion-page-content">
       <h2>Traffic Congestion Page</h2>
-      <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
-        <canvas
-          id="myLineChart"
-          style={{ width: "100%", height: "auto" }}
-        ></canvas>
+      <div>
+        <input
+          type="text"
+          placeholder="Enter Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+        {renderGoogleMap()}
+        <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+          <canvas
+            id="myLineChart"
+            style={{ width: "100%", height: "auto" }}
+          ></canvas>
+        </div>
       </div>
     </div>
   );

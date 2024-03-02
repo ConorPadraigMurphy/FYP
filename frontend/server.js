@@ -34,6 +34,7 @@ const vehicleSchema = new mongoose.Schema({
   exited_time: Number,
   direction: String,
   timestamp: Number,
+  address: String,
 });
 
 // Create a mongoose model
