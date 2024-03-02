@@ -50,7 +50,7 @@ const TrafficCongestionPage = () => {
   const groupDataByLocation = (data) => {
     const groupedData = {};
     data.forEach((vehicle) => {
-      const locationKey = `${vehicle.latitude}_${vehicle.longitude}`;
+      const locationKey = vehicle.address;
       if (!groupedData[locationKey]) {
         groupedData[locationKey] = {
           location: {
@@ -159,7 +159,7 @@ const TrafficCongestionPage = () => {
         >
           {groupedLocations.map((location) => (
             <Marker
-              key={`${location.location.lat}_${location.location.lng}`}
+              key={`${location.address}`}
               position={location.location}
               title={location.address}
               onClick={() => handleMarkerClick(location)}
@@ -174,12 +174,6 @@ const TrafficCongestionPage = () => {
     <div className="trafficCongestion-page-content">
       <h2>Traffic Congestion Page</h2>
       <div>
-        <input
-          type="text"
-          placeholder="Enter Address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
         {renderGoogleMap()}
         <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
           <canvas
