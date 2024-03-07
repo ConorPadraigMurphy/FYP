@@ -6,6 +6,12 @@ const mongoose = require("mongoose");
 const port = 3001;
 require('dotenv').config({ path: '../.env' });
 
+// Allows to take in JSON for login details
+app.use(express.json());
+
+// import your route.js
+app.use("/api/auth", require("./Auth/Route"))
+
 // Use environment variables for sensitive information
 const MONGO_URI = process.env.MONGO_API_KEY;
 
@@ -52,6 +58,11 @@ app.get("/api/vehicleData", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+///////// User Authentication ///////////
+
+
 
 // Start the server
 app.listen(port, () => {

@@ -1,0 +1,41 @@
+{
+	"info": {
+		"_postman_id": "718ec37f-3986-428f-9af2-3ea99d4a0a6c",
+		"name": "FYP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25870780"
+	},
+	"item": [
+		{
+			"name": "http://localhost:3001/api/auth/register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"test1\",\n    \"password\": \"123567\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				},
+				"description": "Register account"
+			},
+			"response": []
+		}
+	]
+}
