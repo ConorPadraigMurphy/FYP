@@ -47,3 +47,18 @@ exports.login = async (req, res, next) => {
         })
     }
 }
+
+// Finds user by id and deletes user
+exports.deleteUser = async (req, res, next) => {
+    const { id } = req.body;
+    try {
+        const user = await User.findOneAndDelete({ _id: id });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(201).json({ message: "User successfully deleted", user });
+    } catch (error) {
+        res.status(400).json({ message: "An error occurred", error: error.message });
+    }
+};
+
