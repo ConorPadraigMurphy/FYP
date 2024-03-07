@@ -16,6 +16,7 @@ This is the README for Rohan and Conors Final Year Project
    - pip install flask
    - pip install confluent-kafka
    - pip install pymongo
+   - pip install python-dotenv
    - Model: YoloV8 (Ultralytics)
 
 ## How to to run the application (Run each command in separate terminals)

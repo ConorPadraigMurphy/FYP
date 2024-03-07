@@ -6,9 +6,15 @@ from datetime import datetime
 from ultralytics import YOLO
 from pymongo import MongoClient
 import json
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+dotenv_path = '../.env'
+load_dotenv(dotenv_path=dotenv_path)
 
 # Mongo Connection string
-client = MongoClient({process.env.MONGO_API_KEY})
+mongo_uri = os.getenv("MONGO_API_KEY")
+client = MongoClient(mongo_uri)
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Mongo DB and collection
