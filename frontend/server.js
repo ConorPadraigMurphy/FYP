@@ -60,10 +60,6 @@ app.get("/api/vehicleData", async (req, res) => {
 });
 
 
-///////// User Authentication ///////////
-
-
-
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
