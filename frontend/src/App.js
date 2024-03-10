@@ -22,6 +22,7 @@ import DirectionsBusSharpIcon from '@mui/icons-material/DirectionsBusSharp';
 import UploadSharpIcon from '@mui/icons-material/UploadSharp';
 import HomePage from './components/HomePage.js';
 import LoginIcon from '@mui/icons-material/Login';
+import SignupPage from './components/SignupPage.js';
 
 
 
@@ -49,6 +50,7 @@ function App() {
           <Route path='/bustimes' element={<BusTimesPage></BusTimesPage>}></Route>
           <Route path='/upload' element={<UploadPage></UploadPage>}></Route>
           <Route path='/login' element={<LoginPage></LoginPage>}></Route>
+          <Route path="/signup" element={<SignupPage />} />
         </Routes>
       </div>
     </Router>
