@@ -1,6 +1,8 @@
 const express = require("express")
 const router = express.Router()
 const { register, login, deleteUser} = require("./Auth")
+const cors = require('cors');
+
 
 //Register route
 //http://localhost:3001/api/auth/register
