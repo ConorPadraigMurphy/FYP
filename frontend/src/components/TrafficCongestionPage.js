@@ -7,6 +7,7 @@ const TrafficCongestionPage = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [address, setAddress] = useState("");
+  const [charts, setCharts] = useState({}); // Keep track of created charts
   const maxGraphWidth = "1080px"; // Maximum width of the graph
 
   useEffect(() => {
@@ -37,7 +38,9 @@ const TrafficCongestionPage = () => {
   }, [address]);
 
   useEffect(() => {
-    createChart();
+    if (selectedLocation) {
+      createChartsForSelectedLocation();
+    }
   }, [selectedLocation]);
 
   const filterDataByAddress = (data, address) => {
@@ -62,81 +65,92 @@ const TrafficCongestionPage = () => {
           timestamps: [],
         };
       }
-      groupedData[locationKey].timestamps.push(vehicle.timestamp);
+      groupedData[locationKey].timestamps.push(vehicle);
     });
     return Object.values(groupedData);
   };
 
-  const createChart = () => {
-    const canvas = document.getElementById("myLineChart");
-    const ctx = canvas ? canvas.getContext("2d") : null;
+  const createChartsForSelectedLocation = () => {
+    // Destroy existing charts
+    Object.values(charts).forEach((chart) => chart.destroy());
+    const groupedData = groupDataByDay(selectedLocation.timestamps);
+    const newCharts = {};
+    Object.keys(groupedData).forEach((day) => {
+      const canvas = document.getElementById(`myLineChart-${day}`);
+      const ctx = canvas ? canvas.getContext("2d") : null;
 
-    if (!ctx) {
-      console.error("Canvas not found");
-      return;
-    }
+      if (!ctx) {
+        console.error("Canvas not found");
+        return;
+      }
 
-    if (canvas.chart) {
-      canvas.chart.data.labels = getUniqueTimestamps(
-        selectedLocation.timestamps
-      );
-      canvas.chart.data.datasets[0].data = getVehicleCounts(
-        selectedLocation.timestamps
-      );
-      canvas.chart.update();
-    } else {
-      if (selectedLocation) {
-        const newChart = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: getUniqueTimestamps(selectedLocation.timestamps),
-            datasets: [
+      const newChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: getUniqueTimestamps(groupedData[day]),
+          datasets: [
+            {
+              label: "Number of Vehicles",
+              data: getVehicleCounts(groupedData[day]),
+              borderColor: "rgba(150, 200, 250, 1)",
+              borderWidth: 2,
+              fill: true,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            xAxes: [
               {
-                label: "Number of Vehicles",
-                data: getVehicleCounts(selectedLocation.timestamps),
-                borderColor: "rgba(150, 200, 250, 1)",
-                borderWidth: 2,
-                fill: true,
+                type: "linear",
+                position: "bottom",
+                display: true,
+              },
+            ],
+            yAxes: [
+              {
+                display: true,
+                ticks: {
+                  beginAtZero: true,
+                },
               },
             ],
           },
-          options: {
-            responsive: true,
-            scales: {
-              xAxes: [
-                {
-                  type: "linear",
-                  position: "bottom",
-                  display: true,
-                },
-              ],
-              yAxes: [
-                {
-                  display: true,
-                  ticks: {
-                    beginAtZero: true,
-                  },
-                },
-              ],
-            },
-          },
-        });
+        },
+      });
 
-        canvas.chart = newChart;
+      newCharts[day] = newChart;
+    });
+
+    setCharts(newCharts);
+  };
+
+  const groupDataByDay = (data) => {
+    const groupedData = {};
+    data.forEach((vehicle) => {
+      const day = vehicle.dayOfWeek;
+      if (!groupedData[day]) {
+        groupedData[day] = [];
       }
-    }
+      groupedData[day].push(vehicle);
+    });
+    return groupedData;
   };
 
   const getUniqueTimestamps = (data) => {
-    const uniqueTimestamps = [...new Set(data.map((timestamp) => timestamp))];
+    const uniqueTimestamps = [
+      ...new Set(data.map((vehicle) => vehicle.timestamp)),
+    ];
     uniqueTimestamps.sort((a, b) => a - b);
     return uniqueTimestamps;
   };
 
   const getVehicleCounts = (data) => {
     const timestampCounts = {};
-    data.forEach((timestamp) => {
-      timestampCounts[timestamp] = (timestampCounts[timestamp] || 0) + 1;
+    data.forEach((vehicle) => {
+      timestampCounts[vehicle.timestamp] =
+        (timestampCounts[vehicle.timestamp] || 0) + 1;
     });
 
     const vehicleCounts = getUniqueTimestamps(data).map(
@@ -158,9 +172,9 @@ const TrafficCongestionPage = () => {
           center={{ lat: 53.274, lng: -9.0568 }}
           zoom={10}
         >
-          {groupedLocations.map((location) => (
+          {groupedLocations.map((location, index) => (
             <Marker
-              key={`${location.address}`}
+              key={`${location.address}-${index}`}
               position={location.location}
               title={location.address}
               onClick={() => handleMarkerClick(location)}
@@ -178,15 +192,27 @@ const TrafficCongestionPage = () => {
         Select a pin below to access user-sourced data and visualize the hourly
         count of vehicles in the area.
       </p>
-      <div style={{ maxWidth: maxGraphWidth, margin: "0 auto" }}>
+
+      <div>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <div style={{ width: maxGraphWidth }}>{renderGoogleMap()}</div>
         </div>
+
+        <div style={{ display: "flex", justifyContent: "center" }}>
         <div style={{ width: maxGraphWidth }}>
-          <canvas
-            id="myLineChart"
-            style={{ width: "100%", height: "auto" }}
-          ></canvas>
+          {selectedLocation &&
+            Object.keys(groupDataByDay(selectedLocation.timestamps)).map(
+              (day, index) => (
+                <div key={index}>
+                  <h3>{day}</h3>
+                  <canvas id={`myLineChart-${day}`}></canvas>
+                </div>
+              )
+            )}
+
+
+        </div>
+
         </div>
       </div>
     </div>
