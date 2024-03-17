@@ -157,6 +157,9 @@ def process_video(video_id, location_data):
         minutes, seconds = divmod(remainder, 60)
         newJustTime = "{:02}:{:02}:{:02}".format(int(hours), int(minutes), int(seconds))
 
+        creationTime = datetime.fromtimestamp(statInfo.st_mtime)
+        dayOfWeek = creationTime.strftime('%A')
+
         # Process object direction information
         for track_id, direction_list in objectDirections.items():
             if not isinstance(direction_list, (list, tuple)):
@@ -176,7 +179,8 @@ def process_video(video_id, location_data):
                         'ClassId': 2,
                         'AvgDirection': avgDirection,
                         'DirectionCategory': directionCategory,
-                        'timestamp': chartTimeStamp
+                        'timestamp': chartTimeStamp,
+                        'dayOfWeek': dayOfWeek,
                     })
                 else:
                     carInfo.append({
@@ -184,7 +188,8 @@ def process_video(video_id, location_data):
                         'ClassId': 5,
                         'AvgDirection': avgDirection,
                         'DirectionCategory': directionCategory,
-                        'timestamp': chartTimeStamp
+                        'timestamp': chartTimeStamp,
+                        'dayOfWeek': dayOfWeek,
                     })
                     
     # Write all object IDs and Timestamps of when the object appears and when the object exits the video to a text file
@@ -224,7 +229,8 @@ def process_video(video_id, location_data):
             'entered_time': start_time,
             'exited_time': end_time,
             'direction': direction,
-            'timestamp':combinedTimeFloat
+            'timestamp':combinedTimeFloat,
+            'dayOfWeek': dayOfWeek
         })
 
 
