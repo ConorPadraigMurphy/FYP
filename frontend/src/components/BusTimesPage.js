@@ -1,81 +1,196 @@
-import React from 'react';
-import Chart from 'chart.js/auto';
+import React, { useEffect, useState } from "react";
+import Chart from "chart.js/auto";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
-class BusTimesPage extends React.Component {
-    componentDidMount() {
-        // Create a bar chart when the component mounts
-        this.createBarChart();
-    }
+const BusTimesPage = () => {
+  const [vehicleData, setVehicleData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [address, setAddress] = useState("");
+  const maxGraphWidth = "1080px"; // Maximum width of the graph
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/api/vehicleData");
 
-    createBarChart() {
-        // Get the canvas element
-        const canvas = document.getElementById('BusBarChart');
-        const ctx = canvas.getContext('2d');
-
-        // Check if a chart instance already exists
-        if (canvas.chart) {
-            // Destroy the existing chart instance
-            canvas.chart.destroy();
+        if (!response.ok) {
+          console.error("Server returned an error:", response.statusText);
+          return;
         }
 
-        // Mock data for the bar chart
-        const mockData = {
-            labels: ['Stop 1', 'Stop 2', 'Stop 3', 'Stop 4', 'Stop 5'],
-            datasets: [{
-                label: 'Bus Arrival Times',
-                data: [5, 10, 15, 8, 12],
-                backgroundColor: [
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(255, 205, 86, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                ],
-                borderColor: [
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(255, 205, 86, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(153, 102, 255, 1)',
-                ],
-                borderWidth: 1,
-            }],
-        };
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          console.error("Invalid content type. Expected application/json.");
+          return;
+        }
 
-        // Create a bar chart with mock data
+        const data = await response.json();
+        const busData = data.filter((vehicle) => vehicle.class_id === "Bus"); // Filter vehicles that have class_id "Bus"
+        setVehicleData(busData);
+        setFilteredData(filterDataByAddress(busData, address));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [address]);
+
+  useEffect(() => {
+    createChart();
+  }, [selectedLocation]);
+
+  const filterDataByAddress = (data, address) => {
+    if (!address) {
+      return data;
+    }
+
+    return data.filter((vehicle) => vehicle.address.includes(address));
+  };
+
+  const groupDataByLocation = (data) => {
+    const groupedData = {};
+    data.forEach((vehicle) => {
+      const locationKey = vehicle.address;
+      if (!groupedData[locationKey]) {
+        groupedData[locationKey] = {
+          location: {
+            lat: parseFloat(vehicle.latitude),
+            lng: parseFloat(vehicle.longitude),
+          },
+          address: vehicle.address,
+          timestamps: [],
+        };
+      }
+      groupedData[locationKey].timestamps.push(vehicle.timestamp);
+    });
+    return Object.values(groupedData);
+  };
+
+  const createChart = () => {
+    const canvas = document.getElementById("myLineChart");
+    const ctx = canvas ? canvas.getContext("2d") : null;
+
+    if (!ctx) {
+      console.error("Canvas not found");
+      return;
+    }
+
+    if (canvas.chart) {
+      canvas.chart.data.labels = getUniqueTimestamps(
+        selectedLocation.timestamps
+      );
+      canvas.chart.data.datasets[0].data = getVehicleCounts(
+        selectedLocation.timestamps
+      );
+      canvas.chart.update();
+    } else {
+      if (selectedLocation) {
         const newChart = new Chart(ctx, {
-            type: 'bar',
-            data: mockData,
-            options: {
-                scales: {
-                    x: {
-                        type: 'category',
-                        labels: mockData.labels,
-                    },
-                    y: {
-                        beginAtZero: true,
-                    },
+          type: "line",
+          data: {
+            labels: getUniqueTimestamps(selectedLocation.timestamps),
+            datasets: [
+              {
+                label: "Number of Buses",
+                data: getVehicleCounts(selectedLocation.timestamps),
+                borderColor: "rgba(255, 50, 50, 1)",
+                borderWidth: 2,
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              xAxes: [
+                {
+                  type: "linear",
+                  position: "bottom",
+                  display: true,
                 },
+              ],
+              yAxes: [
+                {
+                  display: true,
+                  ticks: {
+                    beginAtZero: true,
+                  },
+                },
+              ],
             },
+          },
         });
 
-        // Attach the chart instance to the canvas element
         canvas.chart = newChart;
+      }
     }
+  };
 
-    render() {
-        return (
-            <div className="busTimes-page-content">
-                <h2>Bus Times Page</h2>
-                {/* Create a canvas element for the bar chart */}
-               
-                <div style={{ maxWidth: '1080px', margin: '0 auto' }}>
-                    {/* Create a canvas element for the line chart */}
-                    <canvas id="BusBarChart" width="400" height="200"></canvas>
-                </div>
-            </div>
-        );
-    }
-}
+  const getUniqueTimestamps = (data) => {
+    const uniqueTimestamps = [...new Set(data.map((timestamp) => timestamp))];
+    uniqueTimestamps.sort((a, b) => a - b);
+    return uniqueTimestamps;
+  };
+
+  const getVehicleCounts = (data) => {
+    const timestampCounts = {};
+    data.forEach((timestamp) => {
+      timestampCounts[timestamp] = (timestampCounts[timestamp] || 0) + 1;
+    });
+
+    const vehicleCounts = getUniqueTimestamps(data).map(
+      (timestamp) => timestampCounts[timestamp]
+    );
+    return vehicleCounts;
+  };
+
+  const handleMarkerClick = (location) => {
+    setSelectedLocation(location);
+  };
+
+  const renderGoogleMap = () => {
+    const groupedLocations = groupDataByLocation(filteredData);
+    return (
+      <LoadScript googleMapsApiKey="AIzaSyBJ39gTzB4yRuN_JTevio4hEcJYSgM8B3o">
+        <GoogleMap
+          mapContainerStyle={{ height: "400px", width: "100%" }}
+          center={{ lat: 53.274, lng: -9.0568 }}
+          zoom={10}
+        >
+          {groupedLocations.map((location) => (
+            <Marker
+              key={`${location.address}`}
+              position={location.location}
+              title={location.address}
+              onClick={() => handleMarkerClick(location)}
+            />
+          ))}
+        </GoogleMap>
+      </LoadScript>
+    );
+  };
+
+  return (
+    <div className="trafficCongestion-page-content">
+      <h2>Bus Schedule Page</h2>
+      <p>
+        Click on a pin below to explore user-provided data and visualize the
+        hourly frequency of bus appearances.
+      </p>
+      <div style={{ maxWidth: maxGraphWidth, margin: "0 auto" }}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={{ width: maxGraphWidth }}>{renderGoogleMap()}</div>
+        </div>
+        <div style={{ width: maxGraphWidth }}>
+          <canvas
+            id="myLineChart"
+            style={{ width: "100%", height: "auto" }}
+          ></canvas>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default BusTimesPage;

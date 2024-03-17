@@ -19,7 +19,7 @@ This is the README for Rohan and Conors Final Year Project
    - pip install python-dotenv
    - Model: YoloV8 (Ultralytics)
 
-## How to to run the application (Run each command in separate terminals)
+## How to run the application (Run each command in separate terminals)
 
 1. Start Zookeeper (Run command in the kafka_2.13 Folder)
    - ./bin/zookeeper-server-start.sh ./config/zookeeper.properties
@@ -27,7 +27,7 @@ This is the README for Rohan and Conors Final Year Project
    - ./bin/kafka-server-start.sh ./config/server.properties
 3. Check if Kafka topics are listed (Run the command in the kafka_2.13 Folder)
    - bin/kafka-topics.sh --list --bootstrap-server localhost:9092
-4. If there is no topics created Create them using below commands (Run command in the kafka_2.13 Folder)
+4. If there are no topics created Create them using the below commands (Run command in the kafka_2.13 Folder)
    - bin/kafka-topics.sh --create --topic incoming-videos --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
    - bin/kafka-topics.sh --create --topic processed-videos --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
 5. Use Command where app.py is located
@@ -37,7 +37,7 @@ This is the README for Rohan and Conors Final Year Project
 7. Run react frontend (Run command in frontend folder)
    - npm start
 
-## How to to run the application on a Windows Machine (Run each command in separate terminals)
+## How to run the application on a Windows Machine (Run each command in separate terminals)
 
 1. Start Zookeeper (windows)
    .\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties

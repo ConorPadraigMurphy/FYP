@@ -7,6 +7,7 @@ const TrafficCongestionPage = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [address, setAddress] = useState("");
+  const maxGraphWidth = "1080px"; // Maximum width of the graph
 
   useEffect(() => {
     const fetchData = async () => {
@@ -173,9 +174,15 @@ const TrafficCongestionPage = () => {
   return (
     <div className="trafficCongestion-page-content">
       <h2>Traffic Congestion Page</h2>
-      <div>
-        {renderGoogleMap()}
-        <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+      <p>
+        Select a pin below to access user-sourced data and visualize the hourly
+        count of vehicles in the area.
+      </p>
+      <div style={{ maxWidth: maxGraphWidth, margin: "0 auto" }}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={{ width: maxGraphWidth }}>{renderGoogleMap()}</div>
+        </div>
+        <div style={{ width: maxGraphWidth }}>
           <canvas
             id="myLineChart"
             style={{ width: "100%", height: "auto" }}
