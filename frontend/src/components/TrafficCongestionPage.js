@@ -39,7 +39,7 @@ const TrafficCongestionPage = () => {
 
   useEffect(() => {
     if (selectedLocation) {
-      createChartsForSelectedLocation();
+      createCharts();
     }
   }, [selectedLocation]);
 
@@ -70,7 +70,7 @@ const TrafficCongestionPage = () => {
     return Object.values(groupedData);
   };
 
-  const createChartsForSelectedLocation = () => {
+  const createCharts = () => {
     // Destroy existing charts
     Object.values(charts).forEach((chart) => chart.destroy());
     const groupedData = groupDataByDay(selectedLocation.timestamps);
@@ -101,21 +101,32 @@ const TrafficCongestionPage = () => {
         options: {
           responsive: true,
           scales: {
-            xAxes: [
-              {
-                type: "linear",
-                position: "bottom",
-                display: true,
+            x: {
+              type: "linear",
+              position: "bottom",
+              display: true,
+              beginAtZero: false,
+              ticks: {
+                stepSize: 1,
+                //callback: (value) => Math.floor(value), // Format tick label
               },
-            ],
-            yAxes: [
-              {
+              title: {
                 display: true,
-                ticks: {
-                  beginAtZero: true,
-                },
+                text: "Time in Hours",
               },
-            ],
+            },
+            y: {
+              display: true,
+              beginAtZero: true,
+              ticks: {
+                stepSize: 5,
+                //callback: (value) => Math.floor(value), // Format tick label
+              },
+              title: {
+                display: true,
+                text: "# of Vehicles",
+              },
+            },
           },
         },
       });
@@ -199,20 +210,17 @@ const TrafficCongestionPage = () => {
         </div>
 
         <div style={{ display: "flex", justifyContent: "center" }}>
-        <div style={{ width: maxGraphWidth }}>
-          {selectedLocation &&
-            Object.keys(groupDataByDay(selectedLocation.timestamps)).map(
-              (day, index) => (
-                <div key={index}>
-                  <h3>{day}</h3>
-                  <canvas id={`myLineChart-${day}`}></canvas>
-                </div>
-              )
-            )}
-
-
-        </div>
-
+          <div style={{ width: maxGraphWidth }}>
+            {selectedLocation &&
+              Object.keys(groupDataByDay(selectedLocation.timestamps)).map(
+                (day, index) => (
+                  <div key={index}>
+                    <h3>{day}</h3>
+                    <canvas id={`myLineChart-${day}`}></canvas>
+                  </div>
+                )
+              )}
+          </div>
         </div>
       </div>
     </div>

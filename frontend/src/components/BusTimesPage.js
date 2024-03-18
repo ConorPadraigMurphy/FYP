@@ -7,7 +7,9 @@ const BusTimesPage = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [address, setAddress] = useState("");
+  const [charts, setCharts] = useState({}); // Keep track of created charts
   const maxGraphWidth = "1080px"; // Maximum width of the graph
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,7 +39,9 @@ const BusTimesPage = () => {
   }, [address]);
 
   useEffect(() => {
-    createChart();
+    if (selectedLocation) {
+      createCharts();
+    }
   }, [selectedLocation]);
 
   const filterDataByAddress = (data, address) => {
@@ -62,81 +66,103 @@ const BusTimesPage = () => {
           timestamps: [],
         };
       }
-      groupedData[locationKey].timestamps.push(vehicle.timestamp);
+      groupedData[locationKey].timestamps.push(vehicle);
     });
     return Object.values(groupedData);
   };
 
-  const createChart = () => {
-    const canvas = document.getElementById("myLineChart");
-    const ctx = canvas ? canvas.getContext("2d") : null;
+  const createCharts = () => {
+    // Destroy existing charts
+    Object.values(charts).forEach((chart) => chart.destroy());
+    const groupedData = groupDataByDay(selectedLocation.timestamps);
+    const newCharts = {};
+    Object.keys(groupedData).forEach((day) => {
+      const canvas = document.getElementById(`myLineChart-${day}`);
+      const ctx = canvas ? canvas.getContext("2d") : null;
 
-    if (!ctx) {
-      console.error("Canvas not found");
-      return;
-    }
+      if (!ctx) {
+        console.error("Canvas not found");
+        return;
+      }
 
-    if (canvas.chart) {
-      canvas.chart.data.labels = getUniqueTimestamps(
-        selectedLocation.timestamps
-      );
-      canvas.chart.data.datasets[0].data = getVehicleCounts(
-        selectedLocation.timestamps
-      );
-      canvas.chart.update();
-    } else {
-      if (selectedLocation) {
-        const newChart = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: getUniqueTimestamps(selectedLocation.timestamps),
-            datasets: [
-              {
-                label: "Number of Buses",
-                data: getVehicleCounts(selectedLocation.timestamps),
-                borderColor: "rgba(255, 50, 50, 1)",
-                borderWidth: 2,
-                fill: true,
+      const newChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: getUniqueTimestamps(groupedData[day]),
+          datasets: [
+            {
+              label: "Number of Vehicles",
+              data: getVehicleCounts(groupedData[day]),
+              borderColor: "rgba(255, 150, 150, 1)",
+              borderWidth: 2,
+              fill: true,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              type: "linear",
+              position: "bottom",
+              display: true,
+              beginAtZero: false,
+              ticks: {
+                stepSize: 1,
+                //callback: (value) => Math.floor(value), // Format tick label
               },
-            ],
-          },
-          options: {
-            responsive: true,
-            scales: {
-              xAxes: [
-                {
-                  type: "linear",
-                  position: "bottom",
-                  display: true,
-                },
-              ],
-              yAxes: [
-                {
-                  display: true,
-                  ticks: {
-                    beginAtZero: true,
-                  },
-                },
-              ],
+              title: {
+                display: true,
+                text: "Time in Hours",
+              },
+            },
+            y: {
+              display: true,
+              beginAtZero: true,
+              ticks: {
+                stepSize: 5,
+                //callback: (value) => Math.floor(value), // Format tick label
+              },
+              title: {
+                display: true,
+                text: "# of Vehicles",
+              },
             },
           },
-        });
+        },
+      });
 
-        canvas.chart = newChart;
+      newCharts[day] = newChart;
+    });
+
+    setCharts(newCharts);
+  };
+
+  const groupDataByDay = (data) => {
+    const groupedData = {};
+    data.forEach((vehicle) => {
+      const day = vehicle.dayOfWeek;
+      if (!groupedData[day]) {
+        groupedData[day] = [];
       }
-    }
+      groupedData[day].push(vehicle);
+    });
+    return groupedData;
   };
 
   const getUniqueTimestamps = (data) => {
-    const uniqueTimestamps = [...new Set(data.map((timestamp) => timestamp))];
+    const uniqueTimestamps = [
+      ...new Set(data.map((vehicle) => vehicle.timestamp)),
+    ];
     uniqueTimestamps.sort((a, b) => a - b);
     return uniqueTimestamps;
   };
 
   const getVehicleCounts = (data) => {
     const timestampCounts = {};
-    data.forEach((timestamp) => {
-      timestampCounts[timestamp] = (timestampCounts[timestamp] || 0) + 1;
+    data.forEach((vehicle) => {
+      timestampCounts[vehicle.timestamp] =
+        (timestampCounts[vehicle.timestamp] || 0) + 1;
     });
 
     const vehicleCounts = getUniqueTimestamps(data).map(
@@ -158,9 +184,9 @@ const BusTimesPage = () => {
           center={{ lat: 53.274, lng: -9.0568 }}
           zoom={10}
         >
-          {groupedLocations.map((location) => (
+          {groupedLocations.map((location, index) => (
             <Marker
-              key={`${location.address}`}
+              key={`${location.address}-${index}`}
               position={location.location}
               title={location.address}
               onClick={() => handleMarkerClick(location)}
@@ -172,21 +198,30 @@ const BusTimesPage = () => {
   };
 
   return (
-    <div className="trafficCongestion-page-content">
+    <div className="bus-times-page">
       <h2>Bus Schedule Page</h2>
       <p>
         Click on a pin below to explore user-provided data and visualize the
         hourly frequency of bus appearances.
       </p>
-      <div style={{ maxWidth: maxGraphWidth, margin: "0 auto" }}>
+
+      <div>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <div style={{ width: maxGraphWidth }}>{renderGoogleMap()}</div>
         </div>
-        <div style={{ width: maxGraphWidth }}>
-          <canvas
-            id="myLineChart"
-            style={{ width: "100%", height: "auto" }}
-          ></canvas>
+
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={{ width: maxGraphWidth }}>
+            {selectedLocation &&
+              Object.keys(groupDataByDay(selectedLocation.timestamps)).map(
+                (day, index) => (
+                  <div key={index}>
+                    <h3>{day}</h3>
+                    <canvas id={`myLineChart-${day}`}></canvas>
+                  </div>
+                )
+              )}
+          </div>
         </div>
       </div>
     </div>
