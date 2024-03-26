@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // import your route.js
-app.use("/api/auth", require("./Auth/Route"))
+app.use("/api/auth", require("../frontend/Auth/Route"))
 
 mongoose.set("strictQuery", true);
 
