@@ -1,4 +1,4 @@
-This is the README for Rohan and Conors Final Year Project
+This is the README for Rohan and Conor's Final Year Project
 
 ## Project Kanban + Gantt Chart
 
