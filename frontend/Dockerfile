@@ -33,4 +33,4 @@ COPY --from=0 /frontend/server.js
 EXPOSE 3000
 
 # Define the command to run the application
-CMD ["sh", "-c", "npm start --prefix frontend & node frontend/server.js"]
+CMD ["sh", "-c", "npm run startFront & node startFront"]
