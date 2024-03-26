@@ -45,8 +45,8 @@ class UploadPage extends React.Component {
     uploadStatus: null, // Track the upload status
     selectedAddress: null, // Store the selected address from search
     mapCenter: {
-      lat: 53.349805, // Default center of the map
-      lng: -6.26031,
+      lat: 53.274, // Default center of the map
+      lng: -9.0568,
     },
     markerPosition: null, // Store marker position for user-selected location
     coordinates: null,
@@ -184,7 +184,7 @@ class UploadPage extends React.Component {
             component="label"
             variant="contained"
             startIcon={<CloudUploadIcon />}
-            disabled={this.state.loading} 
+            disabled={this.state.loading}
           >
             Upload Video
             <VisuallyHiddenInput
