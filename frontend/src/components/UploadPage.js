@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
@@ -185,6 +185,7 @@ class UploadPage extends React.Component {
             variant="contained"
             startIcon={<CloudUploadIcon />}
             disabled={this.state.loading}
+            style={{ marginTop: "20px" }}
           >
             Upload Video
             <VisuallyHiddenInput
