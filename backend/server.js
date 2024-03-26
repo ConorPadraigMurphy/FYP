@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const port = 3001;
-require('dotenv').config({ path: '../.env' });
+require("dotenv").config({ path: "../.env" });
 
 // Use environment variables for sensitive information
 const MONGO_URI = process.env.MONGO_API_KEY;
@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // import your route.js
-app.use("/api/auth", require("../frontend/Auth/Route"))
+app.use("/api/auth", require("./Auth/Route"));
 
 mongoose.set("strictQuery", true);
 
