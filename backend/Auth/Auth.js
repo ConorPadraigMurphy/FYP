@@ -1,6 +1,6 @@
 // Hashing library
 const bcrypt = require("bcryptjs");
-const User = require("../../frontend/model/User");
+const User = require("../model/User");
 
 // Validations of register data and create or error
 exports.register = async (req, res, next) => {
