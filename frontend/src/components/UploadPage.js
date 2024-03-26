@@ -103,7 +103,7 @@ class UploadPage extends React.Component {
   renderMap() {
     return (
       <LoadScript
-        googleMapsApiKey="AIzaSyBJ39gTzB4yRuN_JTevio4hEcJYSgM8B3o"
+        googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
         libraries={libraries}
       >
         <GoogleMap

@@ -60,6 +60,6 @@ app.get("/api/vehicleData", async (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
+app.listen(port, process.env.IP, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
