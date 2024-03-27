@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.c55ff897.css",
+    "main.js": "/static/js/main.ebe07555.js",
+    "static/js/787.cda612ba.chunk.js": "/static/js/787.cda612ba.chunk.js",
+    "static/media/TrafficCover.png": "/static/media/TrafficCover.81f57ec8b04f63a5e2fa.png",
+    "index.html": "/index.html",
+    "main.c55ff897.css.map": "/static/css/main.c55ff897.css.map",
+    "main.ebe07555.js.map": "/static/js/main.ebe07555.js.map",
+    "787.cda612ba.chunk.js.map": "/static/js/787.cda612ba.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c55ff897.css",
+    "static/js/main.ebe07555.js"
+  ]
+}
