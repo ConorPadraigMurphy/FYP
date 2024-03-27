@@ -13,7 +13,9 @@ const BusTimesPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/vehicleData");
+        const response = await fetch(
+          process.env.REACT_APP_ENDPOINT_URL + "/api/vehicleData"
+        );
 
         if (!response.ok) {
           console.error("Server returned an error:", response.statusText);
