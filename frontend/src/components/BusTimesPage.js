@@ -111,7 +111,6 @@ const BusTimesPage = () => {
               beginAtZero: false,
               ticks: {
                 stepSize: 1,
-                //callback: (value) => Math.floor(value), // Format tick label
               },
               title: {
                 display: true,
@@ -123,7 +122,6 @@ const BusTimesPage = () => {
               beginAtZero: true,
               ticks: {
                 stepSize: 5,
-                //callback: (value) => Math.floor(value), // Format tick label
               },
               title: {
                 display: true,
@@ -143,7 +141,16 @@ const BusTimesPage = () => {
   const groupDataByDay = (data) => {
     const groupedData = {};
     data.forEach((vehicle) => {
-      const day = vehicle.dayOfWeek;
+      const weekday = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const day = weekday[new Date(vehicle.entered_time).getDay()];
       if (!groupedData[day]) {
         groupedData[day] = [];
       }
@@ -154,7 +161,15 @@ const BusTimesPage = () => {
 
   const getUniqueTimestamps = (data) => {
     const uniqueTimestamps = [
-      ...new Set(data.map((vehicle) => vehicle.timestamp)),
+      ...new Set(
+        data.map((vehicle) => {
+          const enteredTime = new Date(vehicle.entered_time);
+          const hour = enteredTime.getHours();
+          const minute = enteredTime.getMinutes();
+          const time = hour + "." + minute;
+          return time;
+        })
+      ),
     ];
     uniqueTimestamps.sort((a, b) => a - b);
     return uniqueTimestamps;
@@ -163,12 +178,15 @@ const BusTimesPage = () => {
   const getVehicleCounts = (data) => {
     const timestampCounts = {};
     data.forEach((vehicle) => {
-      timestampCounts[vehicle.timestamp] =
-        (timestampCounts[vehicle.timestamp] || 0) + 1;
+      const enteredTime = new Date(vehicle.entered_time);
+      const hour = enteredTime.getHours();
+      const minute = enteredTime.getMinutes();
+      const key = hour + "." + minute;
+      timestampCounts[key] = (timestampCounts[key] || 0) + 1;
     });
 
     const vehicleCounts = getUniqueTimestamps(data).map(
-      (timestamp) => timestampCounts[timestamp]
+      (key) => timestampCounts[key] || 0
     );
     return vehicleCounts;
   };
