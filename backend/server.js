@@ -36,10 +36,8 @@ main().catch((err) => console.log(err));
 const vehicleSchema = new mongoose.Schema({
   object_id: Number,
   class_id: String,
-  entered_time: Number,
-  exited_time: Number,
+  entered_time: Date,
   direction: String,
-  timestamp: Number,
   address: String,
 });
 
