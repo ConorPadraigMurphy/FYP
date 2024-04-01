@@ -11,7 +11,9 @@ function CardComponent({ title, category, content }) {
     <Card variant="outlined">
       <CardContent>
         <Typography sx={{ fontSize: 16 }} color="text.primary" gutterBottom>
-          <u><b>{category}</b></u>
+          <u>
+            <b>{category}</b>
+          </u>
         </Typography>
         <Typography variant="h5" component="div">
           {title}
@@ -20,9 +22,6 @@ function CardComponent({ title, category, content }) {
           {content}
         </Typography>
       </CardContent>
-      <CardActions>
-        <Button size="small">Read More</Button>
-      </CardActions>
     </Card>
   );
 }
@@ -30,6 +29,24 @@ function CardComponent({ title, category, content }) {
 export default function GridOfTrafficCards() {
   return (
     <Grid container spacing={2} sx={{ padding: 2 }}>
+      <Grid item xs={12}>
+        <Card variant="outlined" sx={{ width: "100%" }}>
+          <CardContent>
+            <Typography variant="h5" component="div">
+              TrafficVision
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Welcome to TrafficVision!, this website provides up-to-date
+              information and insights on traffic conditions in your local area.
+              We do this with the help of YOU!. We process crowd sourced traffic
+              videos to help provide a realistic view of what traffic during
+              certain hours looks like on avaliable roads as well as providing
+              times at which buses pass certain roads to help you get an
+              accurate looke at what time your bus may actually appear.
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
       <Grid item xs={12} sm={6} md={4}>
         <CardComponent
           title="Traffic Congestion on Main Street"
