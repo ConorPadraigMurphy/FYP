@@ -10,6 +10,10 @@ import {
   Marker,
 } from "@react-google-maps/api";
 import FadeLoader from "react-spinners/FadeLoader";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { MobileDateTimePicker } from "@mui/x-date-pickers/MobileDateTimePicker";
+import dayjs from "dayjs";
 
 // Styles for visually hidden input for accessibility
 const VisuallyHiddenInput = styled("input")({
@@ -51,6 +55,7 @@ class UploadPage extends React.Component {
     markerPosition: null, // Store marker position for user-selected location
     coordinates: null,
     loading: false, // For development purposes, display the marker coordinates
+    selectedDateandTime: null,
   };
 
   onSearchBoxLoaded = (ref) => {
@@ -100,6 +105,12 @@ class UploadPage extends React.Component {
     this.updateAddressFromCoordinates(newLat, newLng);
   };
 
+  handleDateTime = (newDate) => {
+    this.setState({
+      selectedDateandTime: newDate,
+    });
+  };
+
   renderMap() {
     return (
       <LoadScript
@@ -132,7 +143,7 @@ class UploadPage extends React.Component {
                 textOverflow: `ellipses`,
                 position: "absolute",
                 left: "50%",
-                marginLeft: "-120px",
+                marginLeft: "-120px"
               }}
             />
           </StandaloneSearchBox>
@@ -176,6 +187,13 @@ class UploadPage extends React.Component {
   render() {
     return (
       <CenteredContainer>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <MobileDateTimePicker
+            defaultValue={dayjs(Date.now())}
+            value={this.selectedDateandTime}
+            onChange={this.handleDateTime}
+          />
+        </LocalizationProvider>
         {this.renderMap()}
         {this.state.loading ? (
           <FadeLoader loading={this.state.loading} color="#4169E1" size={15} />
@@ -232,6 +250,7 @@ class UploadPage extends React.Component {
       // Also include the coordinates
       formData.append("latitude", this.state.markerPosition.lat.toString());
       formData.append("longitude", this.state.markerPosition.lng.toString());
+      formData.append("dateTime", this.state.selectedDateandTime.toISOString());
     }
     // Perform the upload via axios
     this.setState({ loading: true });
