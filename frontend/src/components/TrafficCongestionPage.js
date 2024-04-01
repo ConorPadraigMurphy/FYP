@@ -161,7 +161,7 @@ const TrafficCongestionPage = () => {
 
   const getUniqueTimestamps = (data) => {
     const uniqueTimestamps = [
-      ...new Set(data.map((vehicle) => vehicle.timestamp)),
+      ...new Set(data.map((vehicle) => vehicle.entered_time)),
     ];
     uniqueTimestamps.sort((a, b) => a - b);
     return uniqueTimestamps;
@@ -170,8 +170,8 @@ const TrafficCongestionPage = () => {
   const getVehicleCounts = (data) => {
     const timestampCounts = {};
     data.forEach((vehicle) => {
-      timestampCounts[vehicle.timestamp] =
-        (timestampCounts[vehicle.timestamp] || 0) + 1;
+      timestampCounts[vehicle.entered_time] =
+        (timestampCounts[vehicle.entered_time] || 0) + 1;
     });
 
     const vehicleCounts = getUniqueTimestamps(data).map(
