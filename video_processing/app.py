@@ -14,16 +14,17 @@ app = Flask(__name__)
 CORS(app)
 # Get the current directory
 current_dir = os.path.dirname(os.path.realpath(__file__))
-inputs_dir = os.path.join(current_dir, 'inputs')
+inputs_dir = os.path.join(current_dir, "inputs")
 
-@app.route('/upload', methods=['POST'])
+
+@app.route("/upload", methods=["POST"])
 def upload_video():
-    if 'file' not in request.files:
-        return abort(400, 'No file part found in request.')
+    if "file" not in request.files:
+        return abort(400, "No file part found in request.")
 
-    file = request.files['file']
-    if file.filename == '':
-        return abort(400, 'No selected file')
+    file = request.files["file"]
+    if file.filename == "":
+        return abort(400, "No selected file")
 
     # Generate a unique video ID
     video_id = str(uuid.uuid4())
@@ -32,31 +33,34 @@ def upload_video():
     file.save(filepath)
 
     # Message with video_id and location data
-    message = json.dumps({
-        'video_id': video_id,
-        'address': request.form['address'],
-        'latitude': request.form['latitude'],
-        'longitude': request.form['longitude']
-    })
-
+    message = json.dumps(
+        {
+            "video_id": video_id,
+            "address": request.form["address"],
+            "latitude": request.form["latitude"],
+            "longitude": request.form["longitude"],
+            "dateTime": request.form["dateTime"],
+        }
+    )
 
     # Produce the video ID to Kafka
     try:
-        producer.produce('incoming-videos', message)
+        producer.produce("incoming-videos", message)
         producer.flush()
     except Exception as e:
-        return jsonify({'error': str(e)})
+        return jsonify({"error": str(e)})
 
-    return jsonify({'message': 'Video uploaded successfully, video_id: ' + video_id})
+    return jsonify({"message": "Video uploaded successfully, video_id: " + video_id})
 
 
 # Kafka configuration
 kafka_config = {
-    'bootstrap.servers': 'localhost:9092'  
+    "bootstrap.servers": "localhost:9092",
+    "max.poll.interval.ms": 600000,
 }
 
 # Create a Kafka producer instance
 producer = Producer(kafka_config)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
