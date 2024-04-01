@@ -29,7 +29,8 @@ const TrafficCongestionPage = () => {
         }
 
         const data = await response.json();
-        setVehicleData(data);
+        const carData = data.filter((vehicle) => vehicle.class_id === "Car"); // Filter vehicles that have class_id "Bus"
+        setVehicleData(carData);
         setFilteredData(filterDataByAddress(data, address));
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -110,7 +111,6 @@ const TrafficCongestionPage = () => {
               beginAtZero: false,
               ticks: {
                 stepSize: 1,
-                //callback: (value) => Math.floor(value), // Format tick label
               },
               title: {
                 display: true,
@@ -122,7 +122,6 @@ const TrafficCongestionPage = () => {
               beginAtZero: true,
               ticks: {
                 stepSize: 5,
-                //callback: (value) => Math.floor(value), // Format tick label
               },
               title: {
                 display: true,
@@ -142,7 +141,16 @@ const TrafficCongestionPage = () => {
   const groupDataByDay = (data) => {
     const groupedData = {};
     data.forEach((vehicle) => {
-      const day = vehicle.dayOfWeek;
+      const weekday = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const day = weekday[new Date(vehicle.entered_time).getDay()];
       if (!groupedData[day]) {
         groupedData[day] = [];
       }
