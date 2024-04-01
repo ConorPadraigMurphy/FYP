@@ -114,7 +114,7 @@ const BusTimesPage = () => {
               },
               title: {
                 display: true,
-                text: "Time in Hours",
+                text: "Time (24hr)",
               },
             },
             y: {
