@@ -143,7 +143,7 @@ class UploadPage extends React.Component {
                 textOverflow: `ellipses`,
                 position: "absolute",
                 left: "50%",
-                marginLeft: "-120px"
+                marginLeft: "-120px",
               }}
             />
           </StandaloneSearchBox>
@@ -185,24 +185,34 @@ class UploadPage extends React.Component {
   };
 
   render() {
+    const { selectedAddress, selectedDateandTime, loading } = this.state;
+    const isUploadDisabled =
+      !selectedAddress || !selectedDateandTime || loading;
     return (
       <CenteredContainer>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <MobileDateTimePicker
-            defaultValue={dayjs(Date.now())}
-            value={this.selectedDateandTime}
-            onChange={this.handleDateTime}
-          />
-        </LocalizationProvider>
+        <div style={{ padding: "30px" }}>
+          <p style={{ fontWeight: "bold", textDecoration: "underline" }}>
+            Select the date & time the video was recorded:
+          </p>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <MobileDateTimePicker
+              value={this.selectedDateandTime}
+              onChange={this.handleDateTime}
+            />
+          </LocalizationProvider>
+        </div>
+        <p style={{ fontWeight: "bold", textDecoration: "underline" }}>
+          Select the location that the video was recorded:
+        </p>
         {this.renderMap()}
-        {this.state.loading ? (
-          <FadeLoader loading={this.state.loading} color="#4169E1" size={15} />
+        {loading ? (
+          <FadeLoader loading={loading} color="#4169E1" size={15} />
         ) : (
           <Button
             component="label"
             variant="contained"
             startIcon={<CloudUploadIcon />}
-            disabled={this.state.loading}
+            disabled={isUploadDisabled}
             style={{ marginTop: "20px" }}
           >
             Upload Video
@@ -225,8 +235,8 @@ class UploadPage extends React.Component {
               : "Error uploading video. Please try again."}
           </p>
         )}
-        {this.state.selectedAddress && (
-          <p>Selected Address: {this.state.selectedAddress}</p> // Display the selected address or coordinates for dev purposes
+        {selectedAddress && (
+          <p>Selected Address: {selectedAddress}</p> // Display the selected address or coordinates for dev purposes
         )}
         {this.state.coordinates && (
           <p>Coordinates: {this.state.coordinates}</p> // Display the current coordinates for development purposes
