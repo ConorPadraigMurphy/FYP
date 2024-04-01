@@ -2,7 +2,7 @@ from confluent_kafka import Consumer, KafkaException, KafkaError
 import cv2
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from ultralytics import YOLO
 from pymongo import MongoClient
 import json
@@ -35,22 +35,35 @@ consumer = Consumer(consumer_conf)
 # Load YOLOv8 model
 model = YOLO("yolov8n.pt")
 OUTPUT_DIR = "Outputs"
-INPUT_DIR = "Inputs"
+INPUT_DIR = "./Inputs"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-def process_video(video_id, location_data):
+class LocationData:
+    address: str
+    latitude: str
+    longitude: str
+    dateTime: datetime
+
+    def __init__(self, address, latitude, longitude, dateTime):
+        self.address = address
+        self.latitude = latitude
+        self.longitude = longitude
+        self.dateTime = dateTime
+
+
+def process_video(video_id, location_data: LocationData):
 
     print(f"Location Data: {location_data}")
-    vid_input_dir = os.path.join(INPUT_DIR, f"{video_id}.mp4")
-    if not os.path.exists(vid_input_dir):
-        print(f"Video file {vid_input_dir} not found.")
+    vid_input_path = os.path.join(INPUT_DIR, f"{video_id}.mp4")
+    if not os.path.exists(vid_input_path):
+        print(f"Video file {vid_input_path} not found.")
         return
 
-    stat_info = os.stat(vid_input_dir)
-    cap = cv2.VideoCapture(vid_input_dir)
+    cap = cv2.VideoCapture(vid_input_path)
+
     if not cap.isOpened():
-        print(f"Failed to open video file {vid_input_dir}.")
+        print(f"Failed to open video file {vid_input_path}.")
         return
 
     downscale_width = 640
@@ -58,10 +71,6 @@ def process_video(video_id, location_data):
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, downscale_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, downscale_height)
-
-    # Getting time and date of video creation from meta data
-    creation_time = datetime.fromtimestamp(stat_info.st_mtime)
-    just_time = creation_time.strftime("%H:%M:%S")
 
     fourcc = cv2.VideoWriter_fourcc(*"XVID")
     output_path = os.path.join(OUTPUT_DIR, f"TrackingvideoOutput_{video_id}.avi")
@@ -77,6 +86,11 @@ def process_video(video_id, location_data):
 
     ret, frame = cap.read()
     while ret:
+
+        frame_time = (
+            timedelta(milliseconds=cap.get(cv2.CAP_PROP_POS_MSEC))
+            + location_data.dateTime
+        )
 
         frame_count += 1
         # Downscales video that is being processed to 640x420
@@ -104,15 +118,9 @@ def process_video(video_id, location_data):
                     unique_objectids.add(track_id)
 
                 # Gets the time that the object enters the videos frame and the time that it leaves the frame
+
                 if track_id not in time_stamps:
-                    time_stamps[track_id] = {
-                        "start_frame": cap.get(cv2.CAP_PROP_POS_FRAMES),
-                        "start_time": cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0,
-                    }
-                time_stamps[track_id]["end_frame"] = cap.get(cv2.CAP_PROP_POS_FRAMES)
-                time_stamps[track_id]["end_time"] = (
-                    cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0
-                )
+                    time_stamps[track_id] = {"start_time": frame_time}
 
                 # Adds object ID to previous positions to keep track of object
                 if track_id not in previous_position:
@@ -134,17 +142,10 @@ def process_video(video_id, location_data):
                     object_directions[track_id] = object_direction
                     previous_position[track_id] = current_x
 
-            # Update end timestamps as the object is still being tracked
-            for track_id in unique_objectids:
-                time_stamps[track_id]["end_frame"] = cap.get(cv2.CAP_PROP_POS_FRAMES)
-                time_stamps[track_id]["end_time"] = (
-                    cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0
-                )
-
             # Works out how many frames are executed by the process per second
             end_time = time.time()
             total_time = end_time - start_time
-            FPS = frame_count / total_time
+            FPS = 1.0 / total_time
 
             annotated_frame_fps = annotated_frame.copy()
             text = f"FPS: {FPS: .2f}"
@@ -170,22 +171,6 @@ def process_video(video_id, location_data):
                 break
 
         total_time = total_frames / 30.0
-        just_time_in_seconds = sum(
-            x * int(t) for x, t in zip([3600, 60, 1], just_time.split(":"))
-        )
-
-        # Subtract totalTime from justTimeInSeconds
-        new_time_in_seconds = just_time_in_seconds - total_time
-
-        # Convert the result back to HH:MM:SS format
-        hours, remainder = divmod(new_time_in_seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        new_just_time = "{:02}:{:02}:{:02}".format(
-            int(hours), int(minutes), int(seconds)
-        )
-
-        creation_time = datetime.fromtimestamp(stat_info.st_mtime)
-        day_of_week = creation_time.strftime("%A")
 
         ret, frame = cap.read()
 
@@ -201,41 +186,24 @@ def process_video(video_id, location_data):
         else:
             continue
 
-        start_time = time_stamps[objectID]["start_time"]
-        end_time = time_stamps[objectID]["end_time"]
         direction = object_directions.get(objectID, "NA")
         if direction > 0:
             direction = "Right"
         else:
             direction = "Left"
 
-        #  Work on entered_time being seconds not hours
-        time_str = new_just_time[:2]
-        time_float = float(time_str)
-        time_seconds = time_float * 3600
-        combined_time = time_seconds + start_time
-
-        hours = int(combined_time / 3600)
-        minutes = int((combined_time - hours * 3600) / 60)
-        combinedtime_float = float(f"{hours}.{minutes}")
-
+        start_time = time_stamps[objectID]["start_time"]
         info_list.append(
             {
                 "object_id": objectID,
                 "class_id": class_name,
                 "entered_time": start_time,
-                "exited_time": end_time,
                 "direction": direction,
-                "timestamp": combinedtime_float,
-                "dayOfWeek": day_of_week,
+                "address": location_data.address,
+                "latitude": location_data.latitude,
+                "longitude": location_data.longitude,
             }
         )
-
-    # Adding location to info_list
-    for info in info_list:
-        info["address"] = location_data.get("address", "")
-        info["latitude"] = location_data.get("latitude", "")
-        info["longitude"] = location_data.get("longitude", "")
 
     # Insert data into MongoDB
     try:
@@ -278,11 +246,12 @@ def consume_loop(consumer, topics):
 
                 # Extract the video ID and location data from the message
                 video_id = message_data["video_id"]
-                location_data = {
-                    "address": message_data.get("address", ""),
-                    "latitude": message_data.get("latitude", ""),
-                    "longitude": message_data.get("longitude", ""),
-                }
+                location_data = LocationData(
+                    message_data.get("address", ""),
+                    message_data.get("latitude", ""),
+                    message_data.get("longitude", ""),
+                    datetime.fromisoformat(message_data.get("dateTime", "")),
+                )
 
                 # Pass the video_id and location_data to your video processing function
                 process_video(video_id, location_data)
