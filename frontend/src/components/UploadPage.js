@@ -118,6 +118,7 @@ class UploadPage extends React.Component {
         libraries={libraries}
       >
         <GoogleMap
+          data-testid="map"
           mapContainerStyle={mapContainerStyle}
           center={this.state.mapCenter}
           zoom={10}
@@ -196,6 +197,7 @@ class UploadPage extends React.Component {
           </p>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <MobileDateTimePicker
+              testid="date-time-picker"
               value={this.selectedDateandTime}
               onChange={this.handleDateTime}
             />
@@ -209,6 +211,7 @@ class UploadPage extends React.Component {
           <FadeLoader loading={loading} color="#4169E1" size={15} />
         ) : (
           <Button
+            testid="uploadButton"
             component="label"
             variant="contained"
             startIcon={<CloudUploadIcon />}
