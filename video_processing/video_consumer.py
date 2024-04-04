@@ -246,11 +246,12 @@ def consume_loop(consumer, topics):
 
                 # Extract the video ID and location data from the message
                 video_id = message_data["video_id"]
+                millis = int(message_data.get("dateTime", 0))
                 location_data = LocationData(
                     message_data.get("address", ""),
                     message_data.get("latitude", ""),
                     message_data.get("longitude", ""),
-                    datetime.fromisoformat(message_data.get("dateTime", "")),
+                    datetime.fromtimestamp(millis / 1000.0),
                 )
 
                 # Pass the video_id and location_data to your video processing function

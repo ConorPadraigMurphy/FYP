@@ -263,7 +263,7 @@ class UploadPage extends React.Component {
       // Also include the coordinates
       formData.append("latitude", this.state.markerPosition.lat.toString());
       formData.append("longitude", this.state.markerPosition.lng.toString());
-      formData.append("dateTime", this.state.selectedDateandTime.toISOString());
+      formData.append("dateTime", this.state.selectedDateandTime.valueOf());
     }
     // Perform the upload via axios
     this.setState({ loading: true });
