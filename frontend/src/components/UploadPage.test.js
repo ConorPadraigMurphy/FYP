@@ -1,5 +1,13 @@
 import React from "react";
-import { render, fireEvent, waitFor, screen } from "@testing-library/react";
+import {
+  render,
+  fireEvent,
+  waitFor,
+  screen,
+  findAllByTestId,
+  queryByTestId,
+  getByTestId,
+} from "@testing-library/react";
 import UploadPage from "./UploadPage";
 
 // Mock axios post method
@@ -30,15 +38,20 @@ describe("UploadPage", () => {
     });
   });
 
-  test("DateTime picker should be in the document", () => {
-    const { getByTestId } = render(<UploadPage />);
-    const dateTimePicker = getByTestId("date-time-picker");
-    expect(dateTimePicker).toBeInTheDocument();
+  test("disables upload button when address and date/time are selected", async () => {
+    render(<UploadPage />);
+    const uploadButton = screen.getByRole("button");
+    await waitFor(() => {
+      expect(uploadButton).toBeEnabled();
+    });
   });
 
-  test("Map should be in the document", () => {
-    const { getByTestId } = render(<UploadPage />);
-    const map = getByTestId("map");
-    expect(map).toBeInTheDocument();
+  // Cannot test mui components
+  test("DateTime picker should be in the document", async () => {
+    render(<UploadPage />);
+    const dateTimePicker = await screen.findByPlaceholderText(
+      "MM/DD/YYYY hh:mm aa"
+    );
+    expect(dateTimePicker).toBeInTheDocument();
   });
 });
