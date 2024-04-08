@@ -4,7 +4,7 @@ services:
     build:
       context: .
     commands:
-      start: flask run
+      start: gunicorn app:app
     ports:
       - 5000
     environment:

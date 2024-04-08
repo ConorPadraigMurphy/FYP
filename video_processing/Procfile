@@ -1,3 +1,2 @@
-web: flask run
+web: gunicorn app:app
 worker: python3 video_consumer.py 
-
