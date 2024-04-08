@@ -46,6 +46,9 @@ def upload_video():
     file = request.files["file"]
     if file.filename == "":
         return abort(400, "No selected file")
+    
+    inputs_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "inputs")
+    os.makedirs(inputs_dir, exist_ok=True)  # Create the directory if it does not exist
 
     # Generate a unique video ID
     video_id = str(uuid.uuid4())
