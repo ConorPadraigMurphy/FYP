@@ -1,1 +1,12 @@
-RUN apt-get update && apt-get install -y libgl1-mesa-glx
+services:
+  web:
+    image: python:3.8-slim
+    commands:
+      start: flask run
+    ports:
+      - 5000
+
+  worker:
+    image: python:3.8-slim
+    commands:
+      start: python3 video_consumer.py
