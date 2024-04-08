@@ -1,1 +1,3 @@
-web: ./start_everything.sh
+web: flask run
+worker: python3 video_consumer.py 
+
