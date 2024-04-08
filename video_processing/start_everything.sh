@@ -1,26 +1,25 @@
 #!/bin/bash
 
-# Start Zookeeper and Kafka
 ls
 echo "Starting Zookeeper and Kafka..."
-cd ../Rohans-Research/kafka_2.13-3.6.0
-./bin/zookeeper-server-start.sh ./config/zookeeper.properties > zookeeper.log 2>&1 &
+# Start Zookeeper
+./kafka_2.13-3.6.0/bin/zookeeper-server-start.sh ./kafka_2.13-3.6.0/config/zookeeper.properties > zookeeper.log 2>&1 &
 sleep 10 # Wait for Zookeeper to fully start
-./bin/kafka-server-start.sh ./config/server.properties > kafka.log 2>&1 &
+
+# Start Kafka
+./kafka_2.13-3.6.0/bin/kafka-server-start.sh ./kafka_2.13-3.6.0/config/server.properties > kafka.log 2>&1 &
 sleep 10 # Wait for Kafka to fully start
 
-# Check and create Kafka topics if necessary
 echo "Setting up Kafka topics..."
-./bin/kafka-topics.sh --list --bootstrap-server localhost:9092 | grep 'incoming-videos' || ./bin/kafka-topics.sh --create --topic incoming-videos --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
-./bin/kafka-topics.sh --list --bootstrap-server localhost:9092 | grep 'processed-videos' || ./bin/kafka-topics.sh --create --topic processed-videos --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+# Check and create Kafka topics if necessary
+./kafka_2.13-3.6.0/bin/kafka-topics.sh --list --bootstrap-server localhost:9092 | grep 'incoming-videos' || ./kafka_2.13-3.6.0/bin/kafka-topics.sh --create --topic incoming-videos --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+./kafka_2.13-3.6.0/bin/kafka-topics.sh --list --bootstrap-server localhost:9092 | grep 'processed-videos' || ./kafka_2.13-3.6.0/bin/kafka-topics.sh --create --topic processed-videos --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
 
-# Navigate to your Flask application directory
 echo "Starting Flask application..."
-cd ../
 export FLASK_APP=app.py
+export FLASK_ENV=development
 flask run > flask.log 2>&1 &
 
-# Run the video_consumer.py script
 echo "Running video_consumer.py script..."
 python3 video_consumer.py > video_consumer.log 2>&1 &
 
