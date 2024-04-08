@@ -6,14 +6,10 @@ echo "Starting Zookeeper and Kafka..."
 ./kafka_2.13-3.6.0/bin/zookeeper-server-start.sh ./kafka_2.13-3.6.0/config/zookeeper.properties > zookeeper.log 2>&1 &
 sleep 10 # Wait for Zookeeper to fully start
 
-lsof -i :2181
-
 
 # Start Kafka
 ./kafka_2.13-3.6.0/bin/kafka-server-start.sh ./kafka_2.13-3.6.0/config/server.properties > kafka.log 2>&1 &
 sleep 10 # Wait for Kafka to fully start
-
-lsof -i :9092
 
 
 echo "Setting up Kafka topics..."
