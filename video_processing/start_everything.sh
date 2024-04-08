@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Start Zookeeper and Kafka
+ls
 echo "Starting Zookeeper and Kafka..."
 cd ../Rohans-Research/kafka_2.13-3.6.0
 ./bin/zookeeper-server-start.sh ./config/zookeeper.properties > zookeeper.log 2>&1 &
@@ -15,7 +16,7 @@ echo "Setting up Kafka topics..."
 
 # Navigate to your Flask application directory
 echo "Starting Flask application..."
-cd /path/to/your/flask/app
+cd ../
 export FLASK_APP=app.py
 flask run > flask.log 2>&1 &
 
