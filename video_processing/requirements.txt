@@ -1,8 +1,8 @@
-confluent-kafka==1.7.0
-opencv-python-headless==4.5.5.62
+confluent-kafka
+opencv-python-headless
 ultralytics
-pymongo==4.0.1
-python-dotenv==0.19.1
-Flask==2.0.1
-kafka-python==2.0.2
-gunicorn==20.0.4
+pymongo
+python-dotenv
+Flask
+kafka-python
+gunicorn
