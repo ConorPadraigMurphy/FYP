@@ -21,6 +21,23 @@ CORS(app)
 current_dir = os.path.dirname(os.path.realpath(__file__))
 inputs_dir = os.path.join(current_dir, "inputs")
 
+@app.route('/')
+def index():
+    return """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Flask App</title>
+    </head>
+    <body>
+        <h1>Welcome to My Flask App!</h1>
+        <p>This is the index page.</p>
+    </body>
+    </html>
+    """
+
 @app.route("/upload", methods=["POST"])
 def upload_video():
     if "file" not in request.files:
