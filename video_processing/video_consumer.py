@@ -27,7 +27,6 @@ consumer_conf = {
     "sasl.mechanisms": "PLAIN",
     "sasl.username": os.getenv("KAFKA_API_KEY"),
     "sasl.password": os.getenv("KAFKA_API_SECRET"), 
-    "group.id": "video-processing-group",
     "auto.offset.reset": "earliest",
     "max.poll.interval.ms": "1000000",
 }
