@@ -3,3 +3,6 @@ opencv-python-headless==4.5.5.62
 ultralytics
 pymongo==4.0.1
 python-dotenv==0.19.1
+Flask==2.0.1
+kafka-python==2.0.2
+gunicorn==20.0.4

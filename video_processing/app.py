@@ -8,6 +8,11 @@ from flask import Flask, jsonify, request, abort
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import json
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+DOTENV_PATH = "./.env"
+load_dotenv(dotenv_path=DOTENV_PATH)
 
 
 app = Flask(__name__)
@@ -15,7 +20,6 @@ CORS(app)
 # Get the current directory
 current_dir = os.path.dirname(os.path.realpath(__file__))
 inputs_dir = os.path.join(current_dir, "inputs")
-
 
 @app.route("/upload", methods=["POST"])
 def upload_video():
@@ -45,19 +49,30 @@ def upload_video():
 
     # Produce the video ID to Kafka
     try:
-        producer.produce("incoming-videos", message)
+        producer.produce("incoming-videos", key=str(uuid.uuid4()), value=message, callback=acked)
         producer.flush()
     except Exception as e:
-        return jsonify({"error": str(e)})
+        print(f"Publish to Kafka failed: {e}")
+        return jsonify({"error": str(e)}), 500
 
     return jsonify({"message": "Video uploaded successfully, video_id: " + video_id})
 
+def acked(err, msg):
+    if err is not None:
+        print(f"Failed to deliver message: {err}")
+    else:
+        print(f"Message delivered to {msg.topic()} [{msg.partition()}] at offset {msg.offset()}")
 
 # Kafka configuration
 kafka_config = {
-    "bootstrap.servers": "localhost:9092",
-    "max.poll.interval.ms": 600000,
+    "bootstrap.servers": os.getenv("KAFKA_BROKER_URL", "localhost:9092"),
+    "security.protocol": "SASL_SSL",
+    "sasl.mechanisms": "PLAIN",
+    "sasl.username": os.getenv("KAFKA_API_KEY"),
+    "sasl.password": os.getenv("KAFKA_API_SECRET"), 
+    "group.id": "video-processing-group",
 }
+
 
 # Create a Kafka producer instance
 producer = Producer(kafka_config)
