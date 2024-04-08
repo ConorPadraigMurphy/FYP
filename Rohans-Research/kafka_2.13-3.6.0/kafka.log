@@ -1593,3 +1593,10 @@ org.apache.kafka.common.network.InvalidReceiveException: Invalid receive (size =
 	at kafka.network.Processor.poll(SocketServer.scala:1107)
 	at kafka.network.Processor.run(SocketServer.scala:1011)
 	at java.base/java.lang.Thread.run(Thread.java:1583)
+[2024-04-08 21:45:12,952] WARN Client session timed out, have not heard from server in 12444ms for session id 0x10004569e610000 (org.apache.zookeeper.ClientCnxn)
+[2024-04-08 21:45:13,243] WARN Session 0x10004569e610000 for server localhost/127.0.0.1:2181, Closing socket connection. Attempting reconnect except it is a SessionExpiredException. (org.apache.zookeeper.ClientCnxn)
+org.apache.zookeeper.ClientCnxn$SessionTimeoutException: Client session timed out, have not heard from server in 12444ms for session id 0x10004569e610000
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1257)
+[2024-04-08 21:45:15,585] INFO Opening socket connection to server localhost/127.0.0.1:2181. (org.apache.zookeeper.ClientCnxn)
+[2024-04-08 21:45:15,611] INFO Socket connection established, initiating session, client: /127.0.0.1:60964, server: localhost/127.0.0.1:2181 (org.apache.zookeeper.ClientCnxn)
+[2024-04-08 21:45:16,076] INFO Session establishment complete on server localhost/127.0.0.1:2181, session id = 0x10004569e610000, negotiated timeout = 18000 (org.apache.zookeeper.ClientCnxn)

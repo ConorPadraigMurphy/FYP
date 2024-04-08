@@ -6,3 +6,4 @@ python-dotenv
 Flask
 kafka-python
 gunicorn
+Flask-Cors
