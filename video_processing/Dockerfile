@@ -19,6 +19,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application
 COPY . .
 
+# Make the start.sh script executable
+RUN chmod +x start.sh
+
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
 
@@ -26,5 +29,6 @@ EXPOSE 5000
 ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
-# Command to run the Flask application
-CMD ["flask", "run"]
+# Command to run the start script
+CMD ["./start.sh"]
+

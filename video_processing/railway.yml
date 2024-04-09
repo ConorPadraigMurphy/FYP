@@ -1,19 +1,12 @@
 services:
   web:
-    image: python:3.8-slim
     build:
       context: .
-    commands:
-      start: gunicorn app:app
     ports:
       - 5000
-    environment:
-      FLASK_APP: app.py
-      FLASK_ENV: development
+    command: "gunicorn -w 4 -b 0.0.0.0:5000 app:app"
 
   worker:
-    image: python:3.8-slim
     build:
       context: .
-    commands:
-      start: python3 video_consumer.py
+    command: "python3 video_consumer.py"
