@@ -21,13 +21,17 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 db = client["FYP"]
 collection = db["FYP"]
 
-# Kafka Consumer Configuration
 consumer_conf = {
-    "bootstrap.servers": "localhost:9092",
+    "bootstrap.servers": os.getenv("KAFKA_BROKER_URL"),
+    "security.protocol": "SASL_SSL",
+    "sasl.mechanisms": "PLAIN",
+    "sasl.username": os.getenv("KAFKA_API_KEY"),
+    "sasl.password": os.getenv("KAFKA_API_SECRET"), 
     "group.id": "video-processing-group",
-    "auto.offset.reset": "latest",
-    "max.poll.interval.ms": 1000000,
+    "auto.offset.reset": "earliest",
+    "max.poll.interval.ms": "1000000",
 }
+
 
 # Create a Kafka Consumer instance
 consumer = Consumer(consumer_conf)

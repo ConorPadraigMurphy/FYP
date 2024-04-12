@@ -1,0 +1,12 @@
+services:
+  web:
+    build:
+      context: .
+    ports:
+      - 5000
+    command: "gunicorn app:app"
+
+  worker:
+    build:
+      context: .
+    command: "python3 video_consumer.py"

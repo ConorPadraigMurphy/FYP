@@ -1,0 +1,1 @@
+[2024-04-08 21:45:13,602] INFO Unable to read additional data from client, it probably closed the socket: address = /127.0.0.1:50295, session = 0x10004569e610000 (org.apache.zookeeper.server.NIOServerCnxn)

@@ -1,0 +1,9 @@
+confluent-kafka
+opencv-python-headless
+ultralytics
+pymongo
+python-dotenv
+Flask
+kafka-python
+gunicorn
+Flask-Cors
