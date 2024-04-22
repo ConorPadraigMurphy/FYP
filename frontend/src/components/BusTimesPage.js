@@ -88,14 +88,14 @@ const BusTimesPage = () => {
       }
 
       const newChart = new Chart(ctx, {
-        type: "line",
+        type: "scatter",
         data: {
           labels: getUniqueTimestamps(groupedData[day]),
           datasets: [
             {
-              label: "Number of Vehicles",
+              label: "Time/Number of Buses",
               data: getVehicleCounts(groupedData[day]),
-              borderColor: "rgba(255, 150, 150, 1)",
+              borderColor: "rgba(255, 100, 100, 1)",
               borderWidth: 2,
               fill: true,
             },
@@ -166,7 +166,8 @@ const BusTimesPage = () => {
           const enteredTime = new Date(vehicle.entered_time);
           const hour = enteredTime.getHours();
           const minute = enteredTime.getMinutes();
-          const time = hour + "." + minute;
+          const time = hour + "." + minute.toString().padStart(2, "0");
+          //const time = hour + "." + minute;
           return time;
         })
       ),
@@ -181,7 +182,7 @@ const BusTimesPage = () => {
       const enteredTime = new Date(vehicle.entered_time);
       const hour = enteredTime.getHours();
       const minute = enteredTime.getMinutes();
-      const key = hour + "." + minute;
+      const key = hour + "." + minute.toString().padStart(2, "0");
       timestampCounts[key] = (timestampCounts[key] || 0) + 1;
     });
 
