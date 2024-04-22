@@ -21,22 +21,18 @@ This is the README for Rohan and Conor's Final Year Project
    - pip install python-dotenv
    - Model: YoloV8 (Ultralytics)
 
-## How to run the application (Run each command in separate terminals)
+3. Install Node packages (Run in Frontend folder)
+   - npm install
 
-1. Start Zookeeper (Run command in the kafka_2.13 Folder)
-   - ./bin/zookeeper-server-start.sh ./config/zookeeper.properties
-2. Start Kafka (Run command in the kafka_2.13 Folder)
-   - ./bin/kafka-server-start.sh ./config/server.properties
-3. Check if Kafka topics are listed (Run the command in the kafka_2.13 Folder)
-   - bin/kafka-topics.sh --list --bootstrap-server localhost:9092
-4. If there are no topics created Create them using the below commands (Run command in the kafka_2.13 Folder)
-   - bin/kafka-topics.sh --create --topic incoming-videos --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
-   - bin/kafka-topics.sh --create --topic processed-videos --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
-5. Use Command where app.py is located
+## How to run the application On a Mac/Linux Machine (Run each command in separate terminals)
+
+1. Use Command where app.py is located
    - flask run
-6. Run video_consumer python script
+2. Run video_consumer python script
    - python3 video_consumer.py
-7. Run react frontend (Run command in frontend folder)
+3. Run Frontend backend
+   - node server.js
+4. Run react frontend (Run command in frontend folder)
    - npm start
 
 ## How to run the application on a Windows Machine (Run each command in separate terminals)
