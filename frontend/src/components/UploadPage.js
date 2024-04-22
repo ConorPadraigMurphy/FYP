@@ -267,7 +267,7 @@ class UploadPage extends React.Component {
     // Perform the upload via axios
     this.setState({ loading: true });
     axios
-      .post("https://fyp-production-f7b2.up.railway.app/upload", formData, {
+      .post("http://127.0.0.1:5000/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
