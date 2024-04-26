@@ -9,9 +9,11 @@
 
 ## Project Dependencies
 
-1. Install Anaconda(python) or Python
+1. **Python**: Download and install Python from the [official Python website](https://www.python.org/downloads/).
 
-2. Installs for app.py
+2. **Node.js**: Download and install Node.js from the [official Node.js website](https://nodejs.org/en/download/).
+
+3. Installs for app.py and video_processing.py
 
    - pip install ultralytics
    - pip install numpy
@@ -20,14 +22,15 @@
    - pip install confluent-kafka
    - pip install pymongo
    - pip install python-dotenv
+   - pip install flask-cors
    - Model: YoloV8 (Ultralytics)
 
-3. Install Node packages (Run in Frontend folder)
+4. Install Node packages (Run in Frontend folder)
    - npm install
 
 ## How to run the application On a Mac/Linux Machine (Run each command in separate terminals)
 
-1. Use Command where app.py is located
+1. Use Command where app.py is located (Run in video_processing folder)
    - flask run
 2. Run video_consumer python script
    - python3 video_consumer.py
@@ -61,3 +64,12 @@
 
 7. Visit the Application and try out the features:<br/>
    https://conorpadraigmurphy.github.io/FYP/
+
+## Troubleshooting
+
+If you encounter any errors or issues while setting up or running the application, please don't hesitate to contact us for assistance:
+
+**Email:** G00389052@atu.ie
+
+We'll be happy to help resolve any issues and ensure that you can successfully run the project.
+
